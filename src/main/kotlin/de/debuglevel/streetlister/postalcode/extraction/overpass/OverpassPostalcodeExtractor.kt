@@ -1,7 +1,9 @@
 package de.debuglevel.streetlister.postalcode.extraction.overpass
 
 import de.debuglevel.streetlister.postalcode.Postalcode
+import de.debuglevel.streetlister.postalcode.extraction.OverpassPostalcodeExtractorSettings
 import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractor
+import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractorSettings
 import de.westnordost.osmapi.OsmConnection
 import de.westnordost.osmapi.overpass.OverpassMapDataDao
 import io.micronaut.context.annotation.Property
@@ -20,9 +22,6 @@ class OverpassPostalcodeExtractor(
 
     private val overpass: OverpassMapDataDao
 
-    private val areaId = 3600051477 // Germany
-    //val areaId=3600017592 // Oberfranken
-
     init {
         logger.debug { "Initialize with base URL $baseUrl..." }
         val millisecondTimeout = timeout.seconds.toInt() * 1000
@@ -30,15 +29,18 @@ class OverpassPostalcodeExtractor(
         overpass = OverpassMapDataDao(osmConnection)
     }
 
-    override fun getPostalcodes(): List<Postalcode> {
-        logger.debug { "Getting postal codes..." }
+    override fun getPostalcodes(
+        postalcodeExtractorSettings: PostalcodeExtractorSettings
+    ): List<Postalcode> {
+        require(postalcodeExtractorSettings is OverpassPostalcodeExtractorSettings) { "postalcodeExtractorSettings must be OverpassPostalcodeExtractorSettings" }
+        logger.debug { "Getting postal codes for area ${postalcodeExtractorSettings.areaId}..." }
 
         val postalcodeListHandler = PostalcodeListHandler()
 
         overpass.queryTable(
             """
             [out:csv(postal_code, note)];
-            area($areaId);
+            area(${postalcodeExtractorSettings.areaId});
             relation["boundary"="postal_code"](area);
             out;
         """.trimIndent(), postalcodeListHandler

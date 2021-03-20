@@ -1,5 +1,6 @@
 package de.debuglevel.streetlister.postalcode
 
+import de.debuglevel.streetlister.postalcode.extraction.OverpassPostalcodeExtractorSettings
 import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractor
 import mu.KotlinLogging
 import java.util.*
@@ -81,7 +82,7 @@ class PostalcodeService(
     }
 
     fun test(): List<Postalcode> {
-        return postalcodeExtractor.getPostalcodes()
+        return postalcodeExtractor.getPostalcodes(OverpassPostalcodeExtractorSettings(3600017592))
     }
 
     class EntityNotFoundException(criteria: Any) : Exception("Entity '$criteria' does not exist.")
