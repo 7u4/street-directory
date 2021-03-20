@@ -1,16 +1,14 @@
 package de.debuglevel.streetlister.postalcode
 
+import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractor
 import mu.KotlinLogging
-import java.io.InputStream
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
 import java.util.*
 import javax.inject.Singleton
-import kotlin.concurrent.thread
 
 @Singleton
 class PostalcodeService(
     private val postalcodeRepository: PostalcodeRepository,
+    private val postalcodeExtractor: PostalcodeExtractor
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -80,6 +78,10 @@ class PostalcodeService(
         val countDeleted = countBefore - countAfter
 
         logger.debug { "Deleted $countDeleted of $countBefore postalcodes, $countAfter remaining" }
+    }
+
+    fun test(): List<Postalcode> {
+        return postalcodeExtractor.getPostalcodes()
     }
 
     class EntityNotFoundException(criteria: Any) : Exception("Entity '$criteria' does not exist.")

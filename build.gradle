@@ -154,6 +154,9 @@ dependencies {
     //implementation "io.micronaut.views:micronaut-views-freemarker"
     //implementation "io.micronaut.views:micronaut-views-rocker"
     //implementation "io.micronaut.views:micronaut-views-soy"
+
+    // OpenStreetMap Overpass
+    implementation "de.westnordost:osmapi-overpass:$osmapiOverpassVersion"
 }
 
 // Java configuration

@@ -1,9 +1,9 @@
 package de.debuglevel.streetlister.postalcode
 
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.*
-import io.micronaut.http.server.types.files.StreamedFile
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Delete
+import io.micronaut.http.annotation.Get
 import io.micronaut.security.annotation.Secured
 import io.micronaut.security.rules.SecurityRule
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -90,5 +90,10 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
             logger.error(e) { "Unhandled exception" }
             HttpResponse.serverError()
         }
+    }
+
+    @Get("/test")
+    fun test(): List<Postalcode> {
+        return postalcodeService.test()
     }
 }

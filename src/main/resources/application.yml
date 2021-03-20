@@ -1,5 +1,13 @@
 app:
   street-lister:
+    postalcodes:
+      extractors:
+        overpass:
+          enabled: true
+          #base-url: https://overpass-api.de/api/
+          # less picky about quotas than overpass-api.de
+          base-url: https://overpass.kumi.systems/api/
+          timeout: 5m
   security:
     configurable-credential-authentication:
       username: "SECRET_USERNAME"
