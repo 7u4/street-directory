@@ -4,6 +4,7 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Delete
 import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Post
 import io.micronaut.security.annotation.Secured
 import io.micronaut.security.rules.SecurityRule
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -77,7 +78,7 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
     }
 
     /**
-     * Delete all postalcode.
+     * Delete all postalcodes.
      */
     @Delete("/")
     fun deleteAllPostalcodes(): HttpResponse<Unit> {
@@ -92,8 +93,8 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
         }
     }
 
-    @Get("/test")
-    fun test(): List<Postalcode> {
-        return postalcodeService.test()
+    @Post("/populate")
+    fun populate() {
+        postalcodeService.populate()
     }
 }

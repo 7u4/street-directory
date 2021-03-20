@@ -2,6 +2,7 @@ package de.debuglevel.streetlister.postalcode
 
 import de.debuglevel.streetlister.postalcode.extraction.OverpassPostalcodeExtractorSettings
 import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractor
+import io.micronaut.data.exceptions.EmptyResultException
 import mu.KotlinLogging
 import java.util.*
 import javax.inject.Singleton
@@ -81,8 +82,39 @@ class PostalcodeService(
         logger.debug { "Deleted $countDeleted of $countBefore postalcodes, $countAfter remaining" }
     }
 
-    fun test(): List<Postalcode> {
-        return postalcodeExtractor.getPostalcodes(OverpassPostalcodeExtractorSettings(3600017592))
+    fun populate() {
+        logger.debug { "Populating postal codes..." }
+        val germanyAreaId = 3600017592
+        val postalcodes = postalcodeExtractor.getPostalcodes(OverpassPostalcodeExtractorSettings(germanyAreaId))
+
+        postalcodes.forEach { addOrUpdate(it) }
+
+        logger.debug { "Populated ${postalcodes.count()} postal codes" }
+    }
+
+    private fun exists(id: UUID): Boolean {
+        logger.debug { "Checking if postalcode $id exists..." }
+        val isExisting = postalcodeRepository.existsById(id)
+        logger.debug { "Checked if postalcode $id exists: $isExisting" }
+        return isExisting
+    }
+
+    private fun exists(code: String): Boolean {
+        logger.debug { "Checking if postalcode $code exists..." }
+        val isExisting = postalcodeRepository.existsByCode(code)
+        logger.debug { "Checked if postalcode $code exists: $isExisting" }
+        return isExisting
+    }
+
+    private fun addOrUpdate(postalcode: Postalcode) {
+        logger.debug { "Adding or updating $postalcode..." }
+
+        try {
+            val existingPostalcode = postalcodeRepository.find(postalcode.code)
+            this.update(existingPostalcode.id!!, postalcode)
+        } catch (e: EmptyResultException) {
+            this.add(postalcode)
+        }
     }
 
     class EntityNotFoundException(criteria: Any) : Exception("Entity '$criteria' does not exist.")
