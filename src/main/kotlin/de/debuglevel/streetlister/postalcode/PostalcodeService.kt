@@ -87,8 +87,13 @@ class PostalcodeService(
 
     fun populate() {
         logger.debug { "Populating postal codes..." }
-        val germanyAreaId = 3600017592
-        val postalcodes = postalcodeExtractor.getPostalcodes(OverpassPostalcodeExtractorSettings(germanyAreaId))
+        val areaIds = mapOf(
+            "Germany" to 3600051477,
+            "Bavaria" to 3602145268,
+            "Upper Frankonia" to 3600017592,
+        )
+        val areaId = areaIds["Germany"]!!
+        val postalcodes = postalcodeExtractor.getPostalcodes(OverpassPostalcodeExtractorSettings(areaId))
 
         postalcodes.forEach { addOrUpdate(it) }
 
