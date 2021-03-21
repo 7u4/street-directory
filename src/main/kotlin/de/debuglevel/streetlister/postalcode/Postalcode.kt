@@ -1,5 +1,8 @@
 package de.debuglevel.streetlister.postalcode
 
+import io.micronaut.data.annotation.DateCreated
+import io.micronaut.data.annotation.DateUpdated
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -26,5 +29,14 @@ data class Postalcode(
      * A note which might be available from some providers
      */
     var note: String? = null,
-
-    )
+    /**
+     * When created in the database
+     */
+    @DateCreated
+    var createdOn: LocalDateTime = LocalDateTime.now(),
+    /**
+     * When last modified in the database
+     */
+    @DateUpdated
+    var lastModifiedOn: LocalDateTime = LocalDateTime.now(),
+)
