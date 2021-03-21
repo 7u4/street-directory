@@ -25,7 +25,10 @@ class PostalcodeListHandler : ListHandler<Array<String>>() {
 
                 Postalcode(
                     id = null,
-                    code = code
+                    code = code,
+                    centerLatitude = latitude,
+                    centerLongitude = longitude,
+                    note = note
                 )
             }
         logger.debug { "Got ${postalcodes.count()} postal codes" }
