@@ -1,5 +1,6 @@
 package de.debuglevel.streetlister.postalcode.extraction.overpass
 
+import de.debuglevel.streetlister.overpass.OverpassQueryBuilder
 import de.debuglevel.streetlister.postalcode.Postalcode
 import de.debuglevel.streetlister.postalcode.extraction.OverpassPostalcodeExtractorSettings
 import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractor
@@ -51,8 +52,13 @@ class OverpassPostalcodeExtractor(
             query += "[timeout:${timeout.seconds}]; // defaults to 180 on Overpass server"
         }
 
+        query += OverpassQueryBuilder.csvOutput(
+            listOf("::id", "::type", "::otype", "::lat", "::lon", "postal_code", "note"),
+            true,
+            "\t"
+        )
+
         query += """        
-            [out:csv(::id, ::type, ::otype, ::lat, ::lon, postal_code, note)];
             area(${areaId});
             relation["boundary"="postal_code"](area);
             out center;
