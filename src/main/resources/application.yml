@@ -7,7 +7,11 @@ app:
           #base-url: https://overpass-api.de/api/
           # less picky about quotas than overpass-api.de
           base-url: https://overpass.kumi.systems/api/
-          timeout: 5m
+          timeout:
+            # timeout to set in the query; might be overridden by the server
+            server: 5m
+            # timeout to abort the HTTP request by the client (should be slightly larger tha server timeout)
+            client: 6m
   security:
     configurable-credential-authentication:
       username: "SECRET_USERNAME"
@@ -41,7 +45,7 @@ micronaut:
 
 logger:
   levels:
-    de.debuglevel: DEBUG
+    de.debuglevel: TRACE
     io.micronaut.http.server: DEBUG
     io.micronaut.data.query: DEBUG
     # io.micronaut.context.condition: DEBUG # log information about loading conditional beans

@@ -18,7 +18,8 @@ import kotlin.system.measureTimeMillis
 @Requires(property = "app.street-lister.postalcodes.extractors.overpass.enabled", value = "true")
 class OverpassPostalcodeExtractor(
     @Property(name = "app.street-lister.postalcodes.extractors.overpass.base-url") val baseUrl: String,
-    @Property(name = "app.street-lister.postalcodes.extractors.overpass.timeout") val timeout: Duration,
+    @Property(name = "app.street-lister.postalcodes.extractors.overpass.timeout.server") val clientTimeout: Duration,
+    @Property(name = "app.street-lister.postalcodes.extractors.overpass.timeout.client") val serverTimeout: Duration,
 ) : PostalcodeExtractor {
     private val logger = KotlinLogging.logger {}
 
@@ -26,7 +27,7 @@ class OverpassPostalcodeExtractor(
 
     init {
         logger.debug { "Initialize with base URL $baseUrl..." }
-        val millisecondTimeout = timeout.seconds.toInt() * 1000
+        val millisecondTimeout = clientTimeout.seconds.toInt() * 1000
         val osmConnection = OsmConnection(baseUrl, "github.com/debuglevel/street-lister", null, millisecondTimeout)
         overpass = OverpassMapDataDao(osmConnection)
     }
@@ -37,15 +38,26 @@ class OverpassPostalcodeExtractor(
         require(postalcodeExtractorSettings is OverpassPostalcodeExtractorSettings) { "postalcodeExtractorSettings must be OverpassPostalcodeExtractorSettings" }
         logger.debug { "Getting postal codes for area ${postalcodeExtractorSettings.areaId}..." }
 
-        val postalcodeListHandler = PostalcodeListHandler()
+        val postalcodes = executeQuery(postalcodeExtractorSettings.areaId)
+            .sortedBy { it.code }
 
+        logger.debug { "Got ${postalcodes.count()} postal codes" }
+        return postalcodes
+    }
+
+    private fun executeQuery(areaId: Long): List<Postalcode> {
+        val postalcodeListHandler = PostalcodeListHandler()
         val queryDuration = measureTimeMillis {
-            overpass.queryTable(buildQuery(postalcodeExtractorSettings.areaId), postalcodeListHandler)
+            overpass.queryTable(buildQuery(areaId, serverTimeout), postalcodeListHandler)
         }
         logger.debug { "Query took ${queryDuration}ms" } // includes overhead for parsing et cetera
+        val postalcodes = postalcodeListHandler.getPostalcodes()
 
-        val postalcodes = postalcodeListHandler.getPostalcodes().sortedBy { it.code }
-        logger.debug { "Got ${postalcodes.count()} postal codes" }
+        // TODO: possible failures:
+        //        - quota reached (what do then?)
+        //        - invalid resultset (don't know if and when happens)
+        //        - empty resultset (might occur if timeout was hit)
+
         return postalcodes
     }
 
