@@ -42,6 +42,9 @@ class PostalcodeService(
         // it would be a "detached entity" otherwise.
         val updatePostalcode = this.get(id).apply {
             code = postalcode.code
+            centerLatitude = postalcode.centerLatitude
+            centerLongitude = postalcode.centerLongitude
+            note = postalcode.note
         }
 
         val updatedPostalcode = postalcodeRepository.update(updatePostalcode)
