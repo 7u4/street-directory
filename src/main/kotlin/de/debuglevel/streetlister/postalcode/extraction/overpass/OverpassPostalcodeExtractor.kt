@@ -63,11 +63,7 @@ class OverpassPostalcodeExtractor(
 
     private fun buildQuery(areaId: Long, timeout: Duration? = null): String {
         var query = ""
-
-        if (timeout != null) {
-            query += "[timeout:${timeout.seconds}]"
-        }
-
+        query += OverpassQueryBuilder.timeout(timeout)
         query += OverpassQueryBuilder.csvOutput(
             listOf("::id", "::type", "::otype", "::lat", "::lon", "postal_code", "note"),
             true,
