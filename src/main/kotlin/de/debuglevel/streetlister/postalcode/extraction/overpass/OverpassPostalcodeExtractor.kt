@@ -12,6 +12,7 @@ import io.micronaut.context.annotation.Requires
 import mu.KotlinLogging
 import java.time.Duration
 import javax.inject.Singleton
+import kotlin.system.measureTimeMillis
 
 @Singleton
 @Requires(property = "app.street-lister.postalcodes.extractors.overpass.enabled", value = "true")
@@ -38,7 +39,10 @@ class OverpassPostalcodeExtractor(
 
         val postalcodeListHandler = PostalcodeListHandler()
 
-        overpass.queryTable(buildQuery(postalcodeExtractorSettings.areaId), postalcodeListHandler)
+        val queryDuration = measureTimeMillis {
+            overpass.queryTable(buildQuery(postalcodeExtractorSettings.areaId), postalcodeListHandler)
+        }
+        logger.debug { "Query took ${queryDuration}ms" } // includes overhead for parsing et cetera
 
         val postalcodes = postalcodeListHandler.getPostalcodes().sortedBy { it.code }
         logger.debug { "Got ${postalcodes.count()} postal codes" }
@@ -49,7 +53,7 @@ class OverpassPostalcodeExtractor(
         var query = ""
 
         if (timeout != null) {
-            query += "[timeout:${timeout.seconds}]; // defaults to 180 on Overpass server"
+            query += "[timeout:${timeout.seconds}]"
         }
 
         query += OverpassQueryBuilder.csvOutput(
