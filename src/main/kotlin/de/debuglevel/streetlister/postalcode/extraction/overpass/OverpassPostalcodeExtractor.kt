@@ -18,8 +18,8 @@ import kotlin.system.measureTimeMillis
 @Requires(property = "app.street-lister.postalcodes.extractors.overpass.enabled", value = "true")
 class OverpassPostalcodeExtractor(
     @Property(name = "app.street-lister.postalcodes.extractors.overpass.base-url") val baseUrl: String,
-    @Property(name = "app.street-lister.postalcodes.extractors.overpass.timeout.server") val clientTimeout: Duration,
-    @Property(name = "app.street-lister.postalcodes.extractors.overpass.timeout.client") val serverTimeout: Duration,
+    @Property(name = "app.street-lister.postalcodes.extractors.overpass.timeout.client") val clientTimeout: Duration,
+    @Property(name = "app.street-lister.postalcodes.extractors.overpass.timeout.server") val serverTimeout: Duration,
 ) : PostalcodeExtractor {
     private val logger = KotlinLogging.logger {}
 
@@ -47,16 +47,27 @@ class OverpassPostalcodeExtractor(
 
     private fun executeQuery(areaId: Long): List<Postalcode> {
         val postalcodeListHandler = PostalcodeListHandler()
-        val queryDuration = measureTimeMillis {
+        val queryDurationMillis = measureTimeMillis {
             overpass.queryTable(buildQuery(areaId, serverTimeout), postalcodeListHandler)
         }
-        logger.debug { "Query took ${queryDuration}ms" } // includes overhead for parsing et cetera
-        val postalcodes = postalcodeListHandler.getPostalcodes()
+        val queryDuration = Duration.ofMillis(queryDurationMillis)
+        logger.debug { "Query took $queryDuration" } // includes overhead for parsing et cetera
+
+        val postalcodes = try {
+            postalcodeListHandler.getPostalcodes()
+        } catch (e: PostalcodeListHandler.EmptyResultSetException) {
+            // if query duration took longer than the server timeout,
+            // there is good chance the server timeout was hit
+            if (queryDuration >= serverTimeout) {
+                throw TimeoutExceededException(serverTimeout, queryDuration)
+            } else {
+                throw e
+            }
+        }
 
         // TODO: possible failures:
         //        - quota reached (what do then?)
         //        - invalid resultset (don't know if and when happens)
-        //        - empty resultset (might occur if timeout was hit)
 
         return postalcodes
     }
@@ -77,4 +88,7 @@ class OverpassPostalcodeExtractor(
                """
         return query.trimIndent()
     }
+
+    data class TimeoutExceededException(val serverTimeout: Duration, val queryDuration: Duration) :
+        Exception("Query ($queryDuration) exceeded server timeout ($serverTimeout)")
 }

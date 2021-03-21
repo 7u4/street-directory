@@ -14,10 +14,10 @@ class PostalcodeListHandler : ListHandler<Array<String>>() {
 
         if (stringArrays.count() == 0) {
             // first line should be CSV header; but not even this line is present
-            throw InvalidResultSet()
+            throw InvalidResultSetException()
         } else if (stringArrays.count() == 1) {
             // a first line is present, but no further lines
-            throw EmptyResultSet()
+            throw EmptyResultSetException()
         }
 
         val postalcodes = stringArrays
@@ -44,7 +44,7 @@ class PostalcodeListHandler : ListHandler<Array<String>>() {
         return postalcodes
     }
 
-    class InvalidResultSet : Exception("Received ResultSet is invalid")
-    class EmptyResultSet : Exception("Received ResultSet is empty")
+    class InvalidResultSetException : Exception("Received ResultSet is invalid")
+    class EmptyResultSetException : Exception("Received ResultSet is empty")
     data class BlankCodeException(val id: Long?) : Exception("id=$id has an empty code")
 }
