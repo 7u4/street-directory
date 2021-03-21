@@ -49,7 +49,7 @@ class OverpassPostalcodeExtractor(
             [out:csv(::id, ::type, ::otype, ::lat, ::lon, postal_code, note)];
             area(${areaId});
             relation["boundary"="postal_code"](area);
-            out;
+            out center;
                """.trimIndent()
     }
 }

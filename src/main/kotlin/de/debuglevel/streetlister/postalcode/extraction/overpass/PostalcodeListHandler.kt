@@ -14,7 +14,7 @@ class PostalcodeListHandler : ListHandler<Array<String>>() {
         val postalcodes = stringArrays
             .drop(1) // skip header
             .map {
-                //logger.trace { "Parsing ${it[0]} ..." }
+                logger.trace { "Parsing '${it.joinToString("|")}' ..." }
                 val id = it[0].toLongOrNull()
                 val type = it[1].ifBlank { null }
                 val typeId = it[2].toIntOrNull()
