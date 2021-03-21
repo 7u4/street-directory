@@ -21,7 +21,7 @@ class PostalcodeListHandler : ListHandler<Array<String>>() {
                 val latitude = it[3].toDoubleOrNull()
                 val longitude = it[4].toDoubleOrNull()
                 val code = it[5].ifBlank { throw BlankCodeException(id) }
-                val note = it[6].ifBlank { null }
+                val note = it.elementAtOrNull(6)?.ifBlank { null }
 
                 Postalcode(
                     id = null,
