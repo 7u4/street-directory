@@ -37,17 +37,19 @@ class OverpassPostalcodeExtractor(
 
         val postalcodeListHandler = PostalcodeListHandler()
 
-        overpass.queryTable(
-            """
-            [out:csv(::id, ::type, ::otype, ::lat, ::lon, postal_code, note)];
-            area(${postalcodeExtractorSettings.areaId});
-            relation["boundary"="postal_code"](area);
-            out;
-        """.trimIndent(), postalcodeListHandler
-        )
+        overpass.queryTable(buildQuery(postalcodeExtractorSettings.areaId), postalcodeListHandler)
 
         val postalcodes = postalcodeListHandler.getPostalcodes().sortedBy { it.code }
         logger.debug { "Got ${postalcodes.count()} postal codes" }
         return postalcodes
+    }
+
+    private fun buildQuery(areaId: Long): String {
+        return """
+            [out:csv(::id, ::type, ::otype, ::lat, ::lon, postal_code, note)];
+            area(${areaId});
+            relation["boundary"="postal_code"](area);
+            out;
+               """.trimIndent()
     }
 }
