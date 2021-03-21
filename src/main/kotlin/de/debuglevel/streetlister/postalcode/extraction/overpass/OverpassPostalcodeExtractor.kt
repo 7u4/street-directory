@@ -44,12 +44,19 @@ class OverpassPostalcodeExtractor(
         return postalcodes
     }
 
-    private fun buildQuery(areaId: Long): String {
-        return """
+    private fun buildQuery(areaId: Long, timeout: Duration? = null): String {
+        var query = ""
+
+        if (timeout != null) {
+            query += "[timeout:${timeout.seconds}]; // defaults to 180 on Overpass server"
+        }
+
+        query += """        
             [out:csv(::id, ::type, ::otype, ::lat, ::lon, postal_code, note)];
             area(${areaId});
             relation["boundary"="postal_code"](area);
             out center;
-               """.trimIndent()
+               """
+        return query.trimIndent()
     }
 }
