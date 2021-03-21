@@ -16,12 +16,12 @@ class PostalcodeListHandler : ListHandler<Array<String>>() {
             .map {
                 //logger.trace { "Parsing ${it[0]} ..." }
                 val id = it[0].toLongOrNull()
-                val type = it[1]
+                val type = it[1].ifBlank { null }
                 val typeId = it[2].toIntOrNull()
                 val latitude = it[3].toDoubleOrNull()
                 val longitude = it[4].toDoubleOrNull()
-                val code = it[5]
-                val note = it[6]
+                val code = it[5].ifBlank { throw BlankCodeException(id) }
+                val note = it[6].ifBlank { null }
 
                 Postalcode(
                     id = null,
@@ -31,4 +31,6 @@ class PostalcodeListHandler : ListHandler<Array<String>>() {
         logger.debug { "Got ${postalcodes.count()} postal codes" }
         return postalcodes
     }
+
+    data class BlankCodeException(val id: Long?) : Exception("id=$id has an empty code")
 }
