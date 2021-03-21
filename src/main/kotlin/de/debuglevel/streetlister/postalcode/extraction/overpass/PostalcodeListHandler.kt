@@ -12,12 +12,20 @@ class PostalcodeListHandler : ListHandler<Array<String>>() {
 
         val stringArrays = this.get()
         val postalcodes = stringArrays
-            .drop(1)
+            .drop(1) // skip header
             .map {
                 //logger.trace { "Parsing ${it[0]} ..." }
+                val id = it[0].toLongOrNull()
+                val type = it[1]
+                val typeId = it[2].toIntOrNull()
+                val latitude = it[3].toDoubleOrNull()
+                val longitude = it[4].toDoubleOrNull()
+                val code = it[5]
+                val note = it[6]
+
                 Postalcode(
                     id = null,
-                    code = it[0]
+                    code = code
                 )
             }
         logger.debug { "Got ${postalcodes.count()} postal codes" }
