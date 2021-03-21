@@ -10,5 +10,8 @@ data class Postalcode(
     @Id
     @GeneratedValue
     var id: UUID?,
-    var code: String
+    /**
+     * The actual value of the postal code
+     */
+    var code: String,
 )
