@@ -4,10 +4,10 @@ import de.debuglevel.streetlister.postalcode.Postalcode
 import de.westnordost.osmapi.common.ListHandler
 import mu.KotlinLogging
 
-class PostalcodeListHandler : ListHandler<Array<String>>() {
+class PostalcodeListHandler : ListHandler<Array<String>>(), OverpassResultHandler<Postalcode> {
     private val logger = KotlinLogging.logger {}
 
-    fun getPostalcodes(): List<Postalcode> {
+    override fun getResults(): List<Postalcode> {
         logger.debug { "Getting postal codes..." }
 
         val stringArrays = this.get()

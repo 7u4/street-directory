@@ -1,6 +1,7 @@
 package de.debuglevel.streetlister.postalcode.extraction.overpass
 
 import de.debuglevel.streetlister.overpass.OverpassQueryBuilder
+import de.debuglevel.streetlister.overpass.OverpassQueryExecutor
 import de.debuglevel.streetlister.postalcode.Postalcode
 import de.debuglevel.streetlister.postalcode.extraction.OverpassPostalcodeExtractorSettings
 import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractor
@@ -12,7 +13,6 @@ import io.micronaut.context.annotation.Requires
 import mu.KotlinLogging
 import java.time.Duration
 import javax.inject.Singleton
-import kotlin.system.measureTimeMillis
 
 @Singleton
 @Requires(property = "app.street-lister.postalcodes.extractors.overpass.enabled", value = "true")
@@ -47,27 +47,10 @@ class OverpassPostalcodeExtractor(
 
     private fun executeQuery(areaId: Long): List<Postalcode> {
         val postalcodeListHandler = PostalcodeListHandler()
-        val queryDurationMillis = measureTimeMillis {
-            overpass.queryTable(buildQuery(areaId, serverTimeout), postalcodeListHandler)
-        }
-        val queryDuration = Duration.ofMillis(queryDurationMillis)
-        logger.debug { "Query took $queryDuration" } // includes overhead for parsing et cetera
+        val query = buildQuery(areaId, serverTimeout)
 
-        val postalcodes = try {
-            postalcodeListHandler.getPostalcodes()
-        } catch (e: PostalcodeListHandler.EmptyResultSetException) {
-            // if query duration took longer than the server timeout,
-            // there is good chance the server timeout was hit
-            if (queryDuration >= serverTimeout) {
-                throw TimeoutExceededException(serverTimeout, queryDuration)
-            } else {
-                throw e
-            }
-        }
-
-        // TODO: possible failures:
-        //        - quota reached (what do then?)
-        //        - invalid resultset (don't know if and when happens)
+        val overpassQueryExecutor = OverpassQueryExecutor<Postalcode>(overpass)
+        val postalcodes = overpassQueryExecutor.execute(query, postalcodeListHandler, serverTimeout)
 
         return postalcodes
     }
