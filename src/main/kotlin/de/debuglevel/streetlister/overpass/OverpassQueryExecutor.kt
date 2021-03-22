@@ -1,6 +1,5 @@
 package de.debuglevel.streetlister.overpass
 
-import de.debuglevel.streetlister.postalcode.extraction.overpass.OverpassPostalcodeExtractor
 import de.debuglevel.streetlister.postalcode.extraction.overpass.OverpassResultHandler
 import de.debuglevel.streetlister.postalcode.extraction.overpass.PostalcodeListHandler
 import de.westnordost.osmapi.OsmConnection
@@ -42,7 +41,7 @@ class OverpassQueryExecutor<T>(baseUrl: String, clientTimeout: Duration) {
             // if query duration took longer than the server timeout,
             // there is good chance the server timeout was hit
             if (queryDuration >= serverTimeout) {
-                throw OverpassPostalcodeExtractor.TimeoutExceededException(serverTimeout, queryDuration)
+                throw TimeoutExceededException(serverTimeout, queryDuration)
             } else {
                 throw e
             }
@@ -55,4 +54,7 @@ class OverpassQueryExecutor<T>(baseUrl: String, clientTimeout: Duration) {
         logger.debug { "Executed Overpass query: ${results.count()} results." }
         return results
     }
+
+    data class TimeoutExceededException(val serverTimeout: Duration, val queryDuration: Duration) :
+        Exception("Query ($queryDuration) exceeded server timeout ($serverTimeout)")
 }

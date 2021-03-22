@@ -60,7 +60,4 @@ class OverpassPostalcodeExtractor(
                """
         return query.trimIndent()
     }
-
-    data class TimeoutExceededException(val serverTimeout: Duration, val queryDuration: Duration) :
-        Exception("Query ($queryDuration) exceeded server timeout ($serverTimeout)")
 }
