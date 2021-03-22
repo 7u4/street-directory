@@ -8,19 +8,34 @@ import mu.KotlinLogging
 import java.time.Duration
 import kotlin.system.measureTimeMillis
 
+/**
+ * Wrapper to osmapi OverpassMapDataDao
+ * @param baseUrl Which Overpass server should be used (e.g. https://overpass-api.de/api/)
+ * @param clientTimeout How long the HTTP client waits for an answer; should be slightly bigger than the server/query timeout.
+ */
 class OverpassQueryExecutor<T>(baseUrl: String, clientTimeout: Duration) {
     private val logger = KotlinLogging.logger {}
 
     private val overpass: OverpassMapDataDao
+
+    /**
+     * User-Agent to send in the HTTP request
+     */
     private val userAgent = "github.com/debuglevel/street-lister"
 
     init {
-        logger.debug { "Initialize with base URL $baseUrl..." }
+        logger.debug { "Initializing with base URL $baseUrl..." }
         val millisecondTimeout = clientTimeout.seconds.toInt() * 1000
         val osmConnection = OsmConnection(baseUrl, userAgent, null, millisecondTimeout)
         overpass = OverpassMapDataDao(osmConnection)
     }
 
+    /**
+     * Execute a Overpass API
+     * @param query Query to execute
+     * @param overpassResultHandler Handler to parse the query results
+     * @param serverTimeout The query timeout setting (or the assumed server default)
+     */
     fun execute(
         query: String,
         overpassResultHandler: OverpassResultHandler<T>,
