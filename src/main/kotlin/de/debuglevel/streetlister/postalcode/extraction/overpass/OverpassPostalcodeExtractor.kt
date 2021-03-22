@@ -6,8 +6,6 @@ import de.debuglevel.streetlister.postalcode.Postalcode
 import de.debuglevel.streetlister.postalcode.extraction.OverpassPostalcodeExtractorSettings
 import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractor
 import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractorSettings
-import de.westnordost.osmapi.OsmConnection
-import de.westnordost.osmapi.overpass.OverpassMapDataDao
 import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Requires
 import mu.KotlinLogging
@@ -22,15 +20,6 @@ class OverpassPostalcodeExtractor(
     @Property(name = "app.street-lister.postalcodes.extractors.overpass.timeout.server") val serverTimeout: Duration,
 ) : PostalcodeExtractor {
     private val logger = KotlinLogging.logger {}
-
-    private val overpass: OverpassMapDataDao
-
-    init {
-        logger.debug { "Initialize with base URL $baseUrl..." }
-        val millisecondTimeout = clientTimeout.seconds.toInt() * 1000
-        val osmConnection = OsmConnection(baseUrl, "github.com/debuglevel/street-lister", null, millisecondTimeout)
-        overpass = OverpassMapDataDao(osmConnection)
-    }
 
     override fun getPostalcodes(
         postalcodeExtractorSettings: PostalcodeExtractorSettings
@@ -49,7 +38,7 @@ class OverpassPostalcodeExtractor(
         val postalcodeListHandler = PostalcodeListHandler()
         val query = buildQuery(areaId, serverTimeout)
 
-        val overpassQueryExecutor = OverpassQueryExecutor<Postalcode>(overpass)
+        val overpassQueryExecutor = OverpassQueryExecutor<Postalcode>(baseUrl, clientTimeout)
         val postalcodes = overpassQueryExecutor.execute(query, postalcodeListHandler, serverTimeout)
 
         return postalcodes

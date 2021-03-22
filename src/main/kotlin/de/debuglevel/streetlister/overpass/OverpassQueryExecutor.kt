@@ -3,15 +3,24 @@ package de.debuglevel.streetlister.overpass
 import de.debuglevel.streetlister.postalcode.extraction.overpass.OverpassPostalcodeExtractor
 import de.debuglevel.streetlister.postalcode.extraction.overpass.OverpassResultHandler
 import de.debuglevel.streetlister.postalcode.extraction.overpass.PostalcodeListHandler
+import de.westnordost.osmapi.OsmConnection
 import de.westnordost.osmapi.overpass.OverpassMapDataDao
 import mu.KotlinLogging
 import java.time.Duration
 import kotlin.system.measureTimeMillis
 
-class OverpassQueryExecutor<T>(
-    private val overpass: OverpassMapDataDao,
-) {
+class OverpassQueryExecutor<T>(baseUrl: String, clientTimeout: Duration) {
     private val logger = KotlinLogging.logger {}
+
+    private val overpass: OverpassMapDataDao
+    private val userAgent = "github.com/debuglevel/street-lister"
+
+    init {
+        logger.debug { "Initialize with base URL $baseUrl..." }
+        val millisecondTimeout = clientTimeout.seconds.toInt() * 1000
+        val osmConnection = OsmConnection(baseUrl, userAgent, null, millisecondTimeout)
+        overpass = OverpassMapDataDao(osmConnection)
+    }
 
     fun execute(
         query: String,
