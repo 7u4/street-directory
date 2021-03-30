@@ -93,6 +93,26 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
         }
     }
 
+    /**
+     * Create a postalcode.
+     * This is not meant for productive use, but rather for uploading backups.
+     */
+    @Post("/")
+    fun postOnePostalcode(addPostalcodeRequest: AddPostalcodeRequest): HttpResponse<AddPostalcodeResponse> {
+        logger.debug("Called postOnePostalcode($addPostalcodeRequest)")
+
+        return try {
+            val postalcode = addPostalcodeRequest.toPostalcode()
+            val addedPostalcode = postalcodeService.add(postalcode)
+
+            val addPostalcodeResponse = AddPostalcodeResponse(addedPostalcode)
+            HttpResponse.created(addPostalcodeResponse)
+        } catch (e: Exception) {
+            logger.error(e) { "Unhandled exception" }
+            HttpResponse.serverError()
+        }
+    }
+
     @Post("/populate")
     fun populate() {
         postalcodeService.populate()
