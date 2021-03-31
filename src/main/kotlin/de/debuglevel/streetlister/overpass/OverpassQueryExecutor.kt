@@ -1,7 +1,5 @@
 package de.debuglevel.streetlister.overpass
 
-import de.debuglevel.streetlister.postalcode.extraction.overpass.OverpassResultHandler
-import de.debuglevel.streetlister.postalcode.extraction.overpass.PostalcodeListHandler
 import de.westnordost.osmapi.OsmConnection
 import de.westnordost.osmapi.overpass.OverpassMapDataDao
 import mu.KotlinLogging
@@ -52,7 +50,7 @@ class OverpassQueryExecutor<T>(baseUrl: String, clientTimeout: Duration) {
 
         val results = try {
             overpassResultHandler.getResults()
-        } catch (e: PostalcodeListHandler.EmptyResultSetException) {
+        } catch (e: EmptyResultSetException) {
             // if query duration took longer than the server timeout,
             // there is good chance the server timeout was hit
             if (queryDuration >= serverTimeout) {

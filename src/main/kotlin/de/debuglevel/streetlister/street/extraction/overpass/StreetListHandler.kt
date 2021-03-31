@@ -1,17 +1,22 @@
-package de.debuglevel.streetlister.postalcode.extraction.overpass
+package de.debuglevel.streetlister.street.extraction.overpass
 
 import de.debuglevel.streetlister.overpass.EmptyResultSetException
 import de.debuglevel.streetlister.overpass.InvalidResultSetException
 import de.debuglevel.streetlister.overpass.OverpassResultHandler
-import de.debuglevel.streetlister.postalcode.Postalcode
+import de.debuglevel.streetlister.street.Street
 import de.westnordost.osmapi.common.ListHandler
 import mu.KotlinLogging
 
-class PostalcodeListHandler : ListHandler<Array<String>>(), OverpassResultHandler<Postalcode> {
+class StreetListHandler(
+    /**
+     * Postal code that will be assigned to every street by this Handler
+     */
+    private val postalcode: String
+) : ListHandler<Array<String>>(), OverpassResultHandler<Street> {
     private val logger = KotlinLogging.logger {}
 
-    override fun getResults(): List<Postalcode> {
-        logger.debug { "Getting postal codes..." }
+    override fun getResults(): List<Street> {
+        logger.debug { "Getting streets..." }
 
         val stringArrays = this.get()
 
@@ -23,7 +28,7 @@ class PostalcodeListHandler : ListHandler<Array<String>>(), OverpassResultHandle
             throw EmptyResultSetException()
         }
 
-        val postalcodes = stringArrays
+        val streets = stringArrays
             .drop(1) // skip header
             .map {
                 logger.trace { "Parsing '${it.joinToString("|")}' ..." }
@@ -32,20 +37,19 @@ class PostalcodeListHandler : ListHandler<Array<String>>(), OverpassResultHandle
                 val typeId = it[2].toIntOrNull()
                 val latitude = it[3].toDoubleOrNull()
                 val longitude = it[4].toDoubleOrNull()
-                val code = it[5].ifBlank { throw BlankCodeException(id) }
-                val note = it.elementAtOrNull(6)?.ifBlank { null }
+                val streetname = it[5].ifBlank { throw BlankStreetnameException(id) }
 
-                Postalcode(
+                Street(
                     id = null,
-                    code = code,
+                    postalcode = postalcode,
+                    streetname = streetname,
                     centerLatitude = latitude,
                     centerLongitude = longitude,
-                    note = note
                 )
             }
-        logger.debug { "Got ${postalcodes.count()} postal codes" }
-        return postalcodes
+        logger.debug { "Got ${streets.count()} streets" }
+        return streets
     }
 
-    data class BlankCodeException(val id: Long?) : Exception("id=$id has an empty code")
+    data class BlankStreetnameException(val id: Long?) : Exception("id=$id has an empty streetname")
 }

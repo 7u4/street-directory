@@ -1,4 +1,4 @@
-package de.debuglevel.streetlister.postalcode.extraction.overpass
+package de.debuglevel.streetlister.overpass
 
 import de.westnordost.osmapi.common.Handler
 
