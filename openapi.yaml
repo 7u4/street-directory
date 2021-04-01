@@ -10,6 +10,115 @@ info:
     url: https://unlicense.org/
   version: "0.1"
 paths:
+  /postalcodes:
+    get:
+      tags:
+      - postalcodes
+      summary: Get all postalcodes
+      description: Get all postalcodes
+      operationId: getAllPostalcodes
+      parameters: []
+      responses:
+        default:
+          description: All postalcodes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetPostalcodeResponse'
+    post:
+      tags:
+      - postalcodes
+      summary: "Create a postalcode.\n This is not meant for productive use, but rather\
+        \ for uploading backups."
+      description: "Create a postalcode.\n This is not meant for productive use, but\
+        \ rather for uploading backups."
+      operationId: postOnePostalcode
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                addPostalcodeRequest:
+                  $ref: '#/components/schemas/AddPostalcodeRequest'
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddPostalcodeResponse'
+    delete:
+      tags:
+      - postalcodes
+      summary: Delete all postalcodes.
+      description: Delete all postalcodes.
+      operationId: deleteAllPostalcodes
+      parameters: []
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+  /postalcodes/{id}:
+    get:
+      tags:
+      - postalcodes
+      summary: Get a postalcode
+      description: Get a postalcode
+      operationId: getOnePostalcode
+      parameters:
+      - name: id
+        in: path
+        description: ID of the postalcode
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        default:
+          description: A postalcode
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPostalcodeResponse'
+    delete:
+      tags:
+      - postalcodes
+      summary: Delete a postalcode.
+      description: Delete a postalcode.
+      operationId: deleteOnePostalcode
+      parameters:
+      - name: id
+        in: path
+        description: ID of the postalcode
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+  /postalcodes/populate:
+    post:
+      tags:
+      - postalcodes
+      operationId: populate
+      parameters: []
+      responses:
+        default:
+          description: populate default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/void'
   /streets:
     get:
       tags:
@@ -131,200 +240,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/void'
-  /postalcodes:
-    get:
-      tags:
-      - postalcodes
-      summary: Get all postalcodes
-      description: Get all postalcodes
-      operationId: getAllPostalcodes
-      parameters: []
-      responses:
-        default:
-          description: All postalcodes
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/GetPostalcodeResponse'
-    post:
-      tags:
-      - postalcodes
-      summary: "Create a postalcode.\n This is not meant for productive use, but rather\
-        \ for uploading backups."
-      description: "Create a postalcode.\n This is not meant for productive use, but\
-        \ rather for uploading backups."
-      operationId: postOnePostalcode
-      parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                addPostalcodeRequest:
-                  $ref: '#/components/schemas/AddPostalcodeRequest'
-        required: true
-      responses:
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AddPostalcodeResponse'
-    delete:
-      tags:
-      - postalcodes
-      summary: Delete all postalcodes.
-      description: Delete all postalcodes.
-      operationId: deleteAllPostalcodes
-      parameters: []
-      responses:
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unit'
-  /postalcodes/{id}:
-    get:
-      tags:
-      - postalcodes
-      summary: Get a postalcode
-      description: Get a postalcode
-      operationId: getOnePostalcode
-      parameters:
-      - name: id
-        in: path
-        description: ID of the postalcode
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        default:
-          description: A postalcode
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostalcodeResponse'
-    delete:
-      tags:
-      - postalcodes
-      summary: Delete a postalcode.
-      description: Delete a postalcode.
-      operationId: deleteOnePostalcode
-      parameters:
-      - name: id
-        in: path
-        description: ID of the postalcode
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unit'
-  /postalcodes/populate:
-    post:
-      tags:
-      - postalcodes
-      operationId: populate
-      parameters: []
-      responses:
-        default:
-          description: populate default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/void'
 components:
   schemas:
-    GetStreetResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        postalcode:
-          type: string
-          description: The postal code
-        streetname:
-          type: string
-          description: The name of the street
-        centerLatitude:
-          type: number
-          description: Latitude of the center of the postal code area
-          format: double
-          nullable: true
-        centerLongitude:
-          type: number
-          description: Longitude of the center of the postal code area
-          format: double
-          nullable: true
-        createdOn:
-          type: string
-          description: When created in the database
-          format: date-time
-        lastModifiedOn:
-          type: string
-          description: When last modified in the database
-          format: date-time
-    Unit:
-      type: object
-    AddStreetResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        postalcode:
-          type: string
-          description: The postal code
-        streetname:
-          type: string
-          description: The name of the street
-        centerLatitude:
-          type: number
-          description: Latitude of the center of the postal code area
-          format: double
-          nullable: true
-        centerLongitude:
-          type: number
-          description: Longitude of the center of the postal code area
-          format: double
-          nullable: true
-        createdOn:
-          type: string
-          description: When created in the database
-          format: date-time
-        lastModifiedOn:
-          type: string
-          description: When last modified in the database
-          format: date-time
-    AddStreetRequest:
-      type: object
-      properties:
-        postalcode:
-          type: string
-          description: The postal code
-        streetname:
-          type: string
-          description: The name of the street
-        centerLatitude:
-          type: number
-          description: Latitude of the center of the postal code area
-          format: double
-          nullable: true
-        centerLongitude:
-          type: number
-          description: Longitude of the center of the postal code area
-          format: double
-          nullable: true
-    void:
-      type: object
     GetPostalcodeResponse:
       type: object
       properties:
@@ -356,6 +273,8 @@ components:
           type: string
           description: When last modified in the database
           format: date-time
+    Unit:
+      type: object
     AddPostalcodeResponse:
       type: object
       properties:
@@ -406,4 +325,85 @@ components:
         note:
           type: string
           description: A note which might be available from some providers
+          nullable: true
+    void:
+      type: object
+    GetStreetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        postalcode:
+          type: string
+          description: The postal code
+        streetname:
+          type: string
+          description: The name of the street
+        centerLatitude:
+          type: number
+          description: Latitude of the center of the postal code area
+          format: double
+          nullable: true
+        centerLongitude:
+          type: number
+          description: Longitude of the center of the postal code area
+          format: double
+          nullable: true
+        createdOn:
+          type: string
+          description: When created in the database
+          format: date-time
+        lastModifiedOn:
+          type: string
+          description: When last modified in the database
+          format: date-time
+    AddStreetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        postalcode:
+          type: string
+          description: The postal code
+        streetname:
+          type: string
+          description: The name of the street
+        centerLatitude:
+          type: number
+          description: Latitude of the center of the postal code area
+          format: double
+          nullable: true
+        centerLongitude:
+          type: number
+          description: Longitude of the center of the postal code area
+          format: double
+          nullable: true
+        createdOn:
+          type: string
+          description: When created in the database
+          format: date-time
+        lastModifiedOn:
+          type: string
+          description: When last modified in the database
+          format: date-time
+    AddStreetRequest:
+      type: object
+      properties:
+        postalcode:
+          type: string
+          description: The postal code
+        streetname:
+          type: string
+          description: The name of the street
+        centerLatitude:
+          type: number
+          description: Latitude of the center of the postal code area
+          format: double
+          nullable: true
+        centerLongitude:
+          type: number
+          description: Longitude of the center of the postal code area
+          format: double
           nullable: true
