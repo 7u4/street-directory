@@ -6,6 +6,8 @@ app:
         # less picky about quotas than overpass-api.de
         base-url: https://overpass.kumi.systems/api/
         user-agent: github.com/debuglevel/street-lister
+        # Number of maximum parallel requests to service
+        maximum-threads: 1
         timeout:
           # timeout to abort the HTTP request by the client (should be slightly larger tha server timeout)
           client: 6m

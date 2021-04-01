@@ -5,6 +5,7 @@ import de.westnordost.osmapi.overpass.OverpassMapDataDao
 import io.micronaut.context.annotation.Property
 import mu.KotlinLogging
 import java.time.Duration
+import java.util.concurrent.Executors
 import javax.inject.Singleton
 import kotlin.system.measureTimeMillis
 
@@ -12,11 +13,14 @@ import kotlin.system.measureTimeMillis
 class OverpassService(
     @Property(name = "app.street-lister.extractors.overpass.base-url") val baseUrl: String,
     @Property(name = "app.street-lister.extractors.overpass.user-agent") val userAgent: String,
+    @Property(name = "app.street-lister.extractors.overpass.maximum-threads") val maximumThreads: Int,
     @Property(name = "app.street-lister.extractors.overpass.timeout.client") val clientTimeout: Duration,
 ) {
     private val logger = KotlinLogging.logger {}
 
     private val overpass: OverpassMapDataDao
+
+    private val executor = Executors.newFixedThreadPool(maximumThreads)
 
     init {
         logger.debug { "Initializing with base URL $baseUrl..." }
@@ -36,32 +40,36 @@ class OverpassService(
         overpassResultHandler: OverpassResultHandler<T>,
         serverTimeout: Duration
     ): List<T> {
-        logger.debug { "Executing Overpass query..." }
-        logger.trace { "Query:\n$query" }
+        logger.debug { "Enqueuing query..." }
+        val results = executor.submit<List<T>> {
+            logger.debug { "Executing Overpass query..." }
+            logger.trace { "Query:\n$query" }
 
-        val queryDurationMillis = measureTimeMillis {
-            overpass.queryTable(query, overpassResultHandler)
-        }
-        val queryDuration = Duration.ofMillis(queryDurationMillis)
-        logger.debug { "Query execution took a round trip time of about $queryDuration" } // includes overhead for transfer, parsing et cetera
-
-        val results = try {
-            overpassResultHandler.getResults()
-        } catch (e: EmptyResultSetException) {
-            // if query duration took longer than the server timeout,
-            // there is good chance the server timeout was hit
-            if (queryDuration >= serverTimeout) {
-                throw TimeoutExceededException(serverTimeout, queryDuration)
-            } else {
-                throw e
+            val queryDurationMillis = measureTimeMillis {
+                overpass.queryTable(query, overpassResultHandler)
             }
-        }
+            val queryDuration = Duration.ofMillis(queryDurationMillis)
+            logger.debug { "Query execution took a round trip time of about $queryDuration" } // includes overhead for transfer, parsing et cetera
 
-        // TODO: possible failures:
-        //        - quota reached (what do then?)
-        //        - invalid resultset (don't know if and when happens)
+            val results = try {
+                overpassResultHandler.getResults()
+            } catch (e: EmptyResultSetException) {
+                // if query duration took longer than the server timeout,
+                // there is good chance the server timeout was hit
+                if (queryDuration >= serverTimeout) {
+                    throw TimeoutExceededException(serverTimeout, queryDuration)
+                } else {
+                    throw e
+                }
+            }
 
-        logger.debug { "Executed Overpass query: ${results.count()} results." }
+            // TODO: possible failures:
+            //        - quota reached (what do then?)
+            //        - invalid resultset (don't know if and when happens)
+
+            logger.debug { "Executed Overpass query: ${results.count()} results." }
+            return@submit results
+        }.get()
         return results
     }
 
