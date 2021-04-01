@@ -2,24 +2,21 @@ package de.debuglevel.streetlister.overpass
 
 import de.westnordost.osmapi.OsmConnection
 import de.westnordost.osmapi.overpass.OverpassMapDataDao
+import io.micronaut.context.annotation.Property
 import mu.KotlinLogging
 import java.time.Duration
+import javax.inject.Singleton
 import kotlin.system.measureTimeMillis
 
-/**
- * Wrapper to osmapi OverpassMapDataDao
- * @param baseUrl Which Overpass server should be used (e.g. https://overpass-api.de/api/)
- * @param clientTimeout How long the HTTP client waits for an answer; should be slightly bigger than the server/query timeout.
- */
-class OverpassQueryExecutor<T>(baseUrl: String, clientTimeout: Duration) {
+@Singleton
+class OverpassService(
+    @Property(name = "app.street-lister.extractors.overpass.base-url") val baseUrl: String,
+    @Property(name = "app.street-lister.extractors.overpass.user-agent") val userAgent: String,
+    @Property(name = "app.street-lister.extractors.overpass.timeout.client") val clientTimeout: Duration,
+) {
     private val logger = KotlinLogging.logger {}
 
     private val overpass: OverpassMapDataDao
-
-    /**
-     * User-Agent to send in the HTTP request
-     */
-    private val userAgent = "github.com/debuglevel/street-lister"
 
     init {
         logger.debug { "Initializing with base URL $baseUrl..." }
@@ -34,7 +31,7 @@ class OverpassQueryExecutor<T>(baseUrl: String, clientTimeout: Duration) {
      * @param overpassResultHandler Handler to parse the query results
      * @param serverTimeout The query timeout setting (or the assumed server default)
      */
-    fun execute(
+    fun <T> execute(
         query: String,
         overpassResultHandler: OverpassResultHandler<T>,
         serverTimeout: Duration

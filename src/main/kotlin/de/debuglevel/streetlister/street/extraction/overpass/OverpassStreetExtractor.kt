@@ -1,7 +1,7 @@
 package de.debuglevel.streetlister.street.extraction.overpass
 
 import de.debuglevel.streetlister.overpass.OverpassQueryBuilder
-import de.debuglevel.streetlister.overpass.OverpassQueryExecutor
+import de.debuglevel.streetlister.overpass.OverpassService
 import de.debuglevel.streetlister.street.Street
 import de.debuglevel.streetlister.street.extraction.OverpassStreetExtractorSettings
 import de.debuglevel.streetlister.street.extraction.StreetExtractor
@@ -15,9 +15,8 @@ import javax.inject.Singleton
 @Singleton
 @Requires(property = "app.street-lister.streets.extractors.overpass.enabled", value = "true")
 class OverpassStreetExtractor(
-    @Property(name = "app.street-lister.streets.extractors.overpass.base-url") val baseUrl: String,
-    @Property(name = "app.street-lister.streets.extractors.overpass.timeout.client") val clientTimeout: Duration,
     @Property(name = "app.street-lister.streets.extractors.overpass.timeout.server") val serverTimeout: Duration,
+    private val overpassService: OverpassService,
 ) : StreetExtractor {
     private val logger = KotlinLogging.logger {}
 
@@ -38,8 +37,7 @@ class OverpassStreetExtractor(
         val streetListHandler = StreetListHandler(postalcode)
         val query = buildQuery(areaId, postalcode, serverTimeout)
 
-        val overpassQueryExecutor = OverpassQueryExecutor<Street>(baseUrl, clientTimeout)
-        val streets = overpassQueryExecutor.execute(query, streetListHandler, serverTimeout)
+        val streets = overpassService.execute(query, streetListHandler, serverTimeout)
 
         return streets
     }

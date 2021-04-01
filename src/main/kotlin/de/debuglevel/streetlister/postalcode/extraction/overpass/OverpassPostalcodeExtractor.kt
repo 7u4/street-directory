@@ -1,7 +1,7 @@
 package de.debuglevel.streetlister.postalcode.extraction.overpass
 
 import de.debuglevel.streetlister.overpass.OverpassQueryBuilder
-import de.debuglevel.streetlister.overpass.OverpassQueryExecutor
+import de.debuglevel.streetlister.overpass.OverpassService
 import de.debuglevel.streetlister.postalcode.Postalcode
 import de.debuglevel.streetlister.postalcode.extraction.OverpassPostalcodeExtractorSettings
 import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractor
@@ -15,9 +15,8 @@ import javax.inject.Singleton
 @Singleton
 @Requires(property = "app.street-lister.postalcodes.extractors.overpass.enabled", value = "true")
 class OverpassPostalcodeExtractor(
-    @Property(name = "app.street-lister.postalcodes.extractors.overpass.base-url") val baseUrl: String,
-    @Property(name = "app.street-lister.postalcodes.extractors.overpass.timeout.client") val clientTimeout: Duration,
     @Property(name = "app.street-lister.postalcodes.extractors.overpass.timeout.server") val serverTimeout: Duration,
+    private val overpassService: OverpassService,
 ) : PostalcodeExtractor {
     private val logger = KotlinLogging.logger {}
 
@@ -38,8 +37,7 @@ class OverpassPostalcodeExtractor(
         val postalcodeListHandler = PostalcodeListHandler()
         val query = buildQuery(areaId, serverTimeout)
 
-        val overpassQueryExecutor = OverpassQueryExecutor<Postalcode>(baseUrl, clientTimeout)
-        val postalcodes = overpassQueryExecutor.execute(query, postalcodeListHandler, serverTimeout)
+        val postalcodes = overpassService.execute(query, postalcodeListHandler, serverTimeout)
 
         return postalcodes
     }

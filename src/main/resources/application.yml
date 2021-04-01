@@ -1,29 +1,28 @@
 app:
   street-lister:
+    extractors:
+      overpass:
+        #base-url: https://overpass-api.de/api/
+        # less picky about quotas than overpass-api.de
+        base-url: https://overpass.kumi.systems/api/
+        user-agent: github.com/debuglevel/street-lister
+        timeout:
+          # timeout to abort the HTTP request by the client (should be slightly larger tha server timeout)
+          client: 6m
     postalcodes:
       extractors:
         overpass:
           enabled: true
-          #base-url: https://overpass-api.de/api/
-          # less picky about quotas than overpass-api.de
-          base-url: https://overpass.kumi.systems/api/
           timeout:
             # timeout to set in the query; might be overridden by the server
             server: 5m
-            # timeout to abort the HTTP request by the client (should be slightly larger tha server timeout)
-            client: 6m
     streets:
       extractors:
         overpass:
           enabled: true
-          #base-url: https://overpass-api.de/api/
-          # less picky about quotas than overpass-api.de
-          base-url: https://overpass.kumi.systems/api/
           timeout:
             # timeout to set in the query; might be overridden by the server
             server: 5m
-            # timeout to abort the HTTP request by the client (should be slightly larger tha server timeout)
-            client: 6m
   security:
     configurable-credential-authentication:
       username: "SECRET_USERNAME"
