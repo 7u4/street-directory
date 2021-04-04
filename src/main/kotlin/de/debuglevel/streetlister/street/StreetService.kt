@@ -3,7 +3,6 @@ package de.debuglevel.streetlister.street
 import de.debuglevel.streetlister.postalcode.PostalcodeService
 import de.debuglevel.streetlister.street.extraction.OverpassStreetExtractorSettings
 import de.debuglevel.streetlister.street.extraction.StreetExtractor
-import io.micronaut.data.exceptions.EmptyResultException
 import mu.KotlinLogging
 import java.time.LocalDateTime
 import java.util.*
@@ -158,7 +157,7 @@ class StreetService(
         try {
             val existingStreet = get(street.postalcode, street.streetname)
             this.update(existingStreet.id!!, street)
-        } catch (e: EmptyResultException) {
+        } catch (e: EntityNotFoundException) {
             this.add(street)
         }
     }
