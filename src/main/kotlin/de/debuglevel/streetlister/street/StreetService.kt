@@ -164,5 +164,5 @@ class StreetService(
     }
 
     class EntityNotFoundException(criteria: Any) : Exception("Entity '$criteria' does not exist.")
-    class MultipleEntitiesFoundException(criteria: Any) : Exception("More then one item meets '$criteria'.")
+    class MultipleEntitiesFoundException(criteria: Any) : Exception("More than one item meets '$criteria'.")
 }
