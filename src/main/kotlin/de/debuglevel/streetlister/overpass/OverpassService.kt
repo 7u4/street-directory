@@ -41,7 +41,6 @@ class OverpassService(
         logger.debug { "Enqueuing query..." }
         val results = executor.submit<List<T>> {
             WaitUtils.waitForNextRequestAllowed(this, overpassProperties.waitBetweenRequests)
-            WaitUtils.setLastRequestDateTime(this)
 
             logger.debug { "Executing Overpass query..." }
             logger.trace { "Query:\n$query" }
@@ -69,6 +68,7 @@ class OverpassService(
             //        - invalid resultset (don't know if and when happens)
 
             logger.debug { "Executed Overpass query: ${results.count()} results." }
+            WaitUtils.setLastRequestDateTime(this)
             return@submit results
         }.get()
         return results
