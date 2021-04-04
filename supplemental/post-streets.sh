@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # usage:
-# curl -o postalcodes.json http://localhost:8080/postalcodes/
-# cat postalcodes.json | post-postalcodes.sh
+# curl -o streets.json http://localhost:8080/streets/
+# cat streets.json | post-streets.sh
 
 BASE_URL=http://localhost:8080
 
