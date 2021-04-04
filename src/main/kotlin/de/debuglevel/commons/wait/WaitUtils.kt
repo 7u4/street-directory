@@ -47,7 +47,8 @@ object WaitUtils {
     }
 
     /**
-     * Sets the last request DateTime for an object to now()
+     * Sets the last request DateTime for an object to now().
+     * This should be called right after the request is finished.
      * @param requester The object which executes the request
      */
     fun setLastRequestDateTime(requester: Any) {
