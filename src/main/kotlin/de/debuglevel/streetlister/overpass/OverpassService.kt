@@ -3,7 +3,6 @@ package de.debuglevel.streetlister.overpass
 import de.debuglevel.commons.wait.WaitUtils
 import de.westnordost.osmapi.OsmConnection
 import de.westnordost.osmapi.overpass.OverpassMapDataDao
-import io.micronaut.context.annotation.Property
 import mu.KotlinLogging
 import java.time.Duration
 import java.util.concurrent.Executors
@@ -12,22 +11,19 @@ import kotlin.system.measureTimeMillis
 
 @Singleton
 class OverpassService(
-    @Property(name = "app.street-lister.extractors.overpass.base-url") val baseUrl: String,
-    @Property(name = "app.street-lister.extractors.overpass.user-agent") val userAgent: String,
-    @Property(name = "app.street-lister.extractors.overpass.maximum-threads") val maximumThreads: Int,
-    @Property(name = "app.street-lister.extractors.overpass.timeout.client") val clientTimeout: Duration,
-    @Property(name = "app.street-lister.extractors.overpass.wait-between-requests") val waitBetweenRequests: Long,
+    private val overpassProperties: OverpassProperties,
 ) {
     private val logger = KotlinLogging.logger {}
 
     private val overpass: OverpassMapDataDao
 
-    private val executor = Executors.newFixedThreadPool(maximumThreads)
+    private val executor = Executors.newFixedThreadPool(overpassProperties.maximumThreads)
 
     init {
-        logger.debug { "Initializing with base URL $baseUrl..." }
-        val millisecondTimeout = clientTimeout.seconds.toInt() * 1000
-        val osmConnection = OsmConnection(baseUrl, userAgent, null, millisecondTimeout)
+        logger.debug { "Initializing with base URL ${overpassProperties.baseUrl}..." }
+        val millisecondTimeout = overpassProperties.timeout.client.seconds.toInt() * 1000
+        val osmConnection =
+            OsmConnection(overpassProperties.baseUrl, overpassProperties.userAgent, null, millisecondTimeout)
         overpass = OverpassMapDataDao(osmConnection)
     }
 
@@ -44,7 +40,7 @@ class OverpassService(
     ): List<T> {
         logger.debug { "Enqueuing query..." }
         val results = executor.submit<List<T>> {
-            WaitUtils.waitForNextRequestAllowed(this, waitBetweenRequests)
+            WaitUtils.waitForNextRequestAllowed(this, overpassProperties.waitBetweenRequests)
             WaitUtils.setLastRequestDateTime(this)
 
             logger.debug { "Executing Overpass query..." }

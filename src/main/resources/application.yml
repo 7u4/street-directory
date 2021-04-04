@@ -2,9 +2,11 @@ app:
   street-lister:
     extractors:
       overpass:
+        # Base URL of the service
         #base-url: https://overpass-api.de/api/
         # less picky about quotas than overpass-api.de
         base-url: https://overpass.kumi.systems/api/
+        # User-Agent to be set in HTTP headers as requested by e.g. overpass-api.de
         user-agent: github.com/debuglevel/street-lister
         # Number of maximum parallel requests to service
         maximum-threads: 1
@@ -12,7 +14,7 @@ app:
         # This should be 0 if maximum-threads is greater than 1.
         wait-between-requests: 1_000_000_000
         timeout:
-          # timeout to abort the HTTP request by the client (should be slightly larger tha server timeout)
+          # timeout to abort the HTTP request by the client (should be slightly larger than server timeout)
           client: 6m
     postalcodes:
       extractors:
