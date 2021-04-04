@@ -5,6 +5,7 @@ import de.debuglevel.streetlister.street.extraction.OverpassStreetExtractorSetti
 import de.debuglevel.streetlister.street.extraction.StreetExtractor
 import io.micronaut.data.exceptions.EmptyResultException
 import mu.KotlinLogging
+import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Singleton
 
@@ -129,6 +130,9 @@ class StreetService(
         postalcodeService.list().forEach { postalcode ->
             val streets = streetExtractor.getStreets(OverpassStreetExtractorSettings(areaId, postalcode.code))
             streets.forEach { street -> addOrUpdate(street) }
+
+            postalcode.lastStreetExtractionOn = LocalDateTime.now()
+            postalcodeService.update(postalcode.id!!, postalcode)
         }
 
         logger.debug { "Populated streets" }

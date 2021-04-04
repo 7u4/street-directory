@@ -24,6 +24,10 @@ data class AddPostalcodeResponse(
      */
     var note: String?,
     /**
+     * DateTime when the last attempt to street extraction was made; null if not yet attempted.
+     */
+    var lastStreetExtractionOn: LocalDateTime? = null,
+    /**
      * When created in the database
      */
     @DateCreated
@@ -40,6 +44,7 @@ data class AddPostalcodeResponse(
         postalcode.centerLatitude,
         postalcode.centerLongitude,
         postalcode.note,
+        postalcode.lastStreetExtractionOn,
         postalcode.createdOn,
         postalcode.lastModifiedOn
     )

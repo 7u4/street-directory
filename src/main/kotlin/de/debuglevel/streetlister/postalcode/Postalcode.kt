@@ -30,6 +30,10 @@ data class Postalcode(
      */
     var note: String? = null,
     /**
+     * DateTime when the last attempt to street extraction was made; null if not yet attempted.
+     */
+    var lastStreetExtractionOn: LocalDateTime? = null,
+    /**
      * When created in the database
      */
     @DateCreated

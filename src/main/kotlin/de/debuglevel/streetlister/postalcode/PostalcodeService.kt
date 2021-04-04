@@ -45,6 +45,7 @@ class PostalcodeService(
             centerLatitude = postalcode.centerLatitude
             centerLongitude = postalcode.centerLongitude
             note = postalcode.note
+            lastStreetExtractionOn = postalcode.lastStreetExtractionOn
         }
 
         val updatedPostalcode = postalcodeRepository.update(updatePostalcode)
