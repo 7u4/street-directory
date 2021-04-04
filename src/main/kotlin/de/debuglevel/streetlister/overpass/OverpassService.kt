@@ -1,5 +1,6 @@
 package de.debuglevel.streetlister.overpass
 
+import de.debuglevel.commons.wait.WaitUtils
 import de.westnordost.osmapi.OsmConnection
 import de.westnordost.osmapi.overpass.OverpassMapDataDao
 import io.micronaut.context.annotation.Property
@@ -15,6 +16,7 @@ class OverpassService(
     @Property(name = "app.street-lister.extractors.overpass.user-agent") val userAgent: String,
     @Property(name = "app.street-lister.extractors.overpass.maximum-threads") val maximumThreads: Int,
     @Property(name = "app.street-lister.extractors.overpass.timeout.client") val clientTimeout: Duration,
+    @Property(name = "app.street-lister.extractors.overpass.wait-between-requests") val waitBetweenRequests: Long,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -42,6 +44,9 @@ class OverpassService(
     ): List<T> {
         logger.debug { "Enqueuing query..." }
         val results = executor.submit<List<T>> {
+            WaitUtils.waitForNextRequestAllowed(this, waitBetweenRequests)
+            WaitUtils.setLastRequestDateTime(this)
+
             logger.debug { "Executing Overpass query..." }
             logger.trace { "Query:\n$query" }
 
