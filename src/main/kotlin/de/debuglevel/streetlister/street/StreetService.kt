@@ -1,11 +1,14 @@
 package de.debuglevel.streetlister.street
 
+import de.debuglevel.streetlister.postalcode.Postalcode
 import de.debuglevel.streetlister.postalcode.PostalcodeService
 import de.debuglevel.streetlister.street.extraction.OverpassStreetExtractorSettings
 import de.debuglevel.streetlister.street.extraction.StreetExtractor
 import mu.KotlinLogging
 import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 import javax.inject.Singleton
 
 @Singleton
@@ -13,8 +16,12 @@ class StreetService(
     private val streetRepository: StreetRepository,
     private val streetExtractor: StreetExtractor,
     private val postalcodeService: PostalcodeService,
+    private val streetProperties: StreetProperties,
 ) {
     private val logger = KotlinLogging.logger {}
+
+    private val queueMonitor = mutableMapOf<Postalcode, Future<*>>()
+    private val executor = Executors.newFixedThreadPool(streetProperties.maximumThreads)
 
     fun get(id: UUID): Street {
         logger.debug { "Getting street with ID '$id'..." }
@@ -127,11 +134,22 @@ class StreetService(
         val areaId = areaIds["Germany"]!!
 
         postalcodeService.list().forEach { postalcode ->
-            val streets = streetExtractor.getStreets(OverpassStreetExtractorSettings(areaId, postalcode.code))
-            streets.forEach { street -> addOrUpdate(street) }
+            logger.debug { "Enqueuing $postalcode..." }
+            if (!queueMonitor.contains(postalcode)) {
+                val future = executor.submit {
+                    val streets = streetExtractor.getStreets(OverpassStreetExtractorSettings(areaId, postalcode.code))
+                    streets.forEach { street -> addOrUpdate(street) }
 
-            postalcode.lastStreetExtractionOn = LocalDateTime.now()
-            postalcodeService.update(postalcode.id!!, postalcode)
+                    postalcode.lastStreetExtractionOn = LocalDateTime.now()
+                    postalcodeService.update(postalcode.id!!, postalcode)
+
+                    queueMonitor.remove(postalcode)
+                }
+                queueMonitor[postalcode] = future
+                logger.debug { "Enqueued $postalcode" }
+            } else {
+                logger.debug { "Not enqueued $postalcode as it was already on queue" }
+            }
         }
 
         logger.debug { "Populated streets" }
