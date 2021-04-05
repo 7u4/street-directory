@@ -1,6 +1,6 @@
 package de.debuglevel.streetlister.street.extraction.overpass
 
-import de.debuglevel.streetlister.overpass.OverpassQueryBuilder
+import de.debuglevel.openstreetmap.overpass.OverpassQueryBuilder
 import de.debuglevel.streetlister.overpass.OverpassService
 import de.debuglevel.streetlister.street.Street
 import de.debuglevel.streetlister.street.extraction.OverpassStreetExtractorSettings

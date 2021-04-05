@@ -1,6 +1,6 @@
 package de.debuglevel.streetlister.postalcode.extraction.overpass
 
-import de.debuglevel.streetlister.overpass.OverpassQueryBuilder
+import de.debuglevel.openstreetmap.overpass.OverpassQueryBuilder
 import de.debuglevel.streetlister.overpass.OverpassService
 import de.debuglevel.streetlister.postalcode.Postalcode
 import de.debuglevel.streetlister.postalcode.extraction.OverpassPostalcodeExtractorSettings

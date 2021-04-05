@@ -1,8 +1,8 @@
 package de.debuglevel.streetlister.postalcode.extraction.overpass
 
-import de.debuglevel.streetlister.overpass.EmptyResultSetException
-import de.debuglevel.streetlister.overpass.InvalidResultSetException
-import de.debuglevel.streetlister.overpass.OverpassResultHandler
+import de.debuglevel.openstreetmap.overpass.EmptyResultSetException
+import de.debuglevel.openstreetmap.overpass.InvalidResultSetException
+import de.debuglevel.openstreetmap.overpass.OverpassResultHandler
 import de.debuglevel.streetlister.postalcode.Postalcode
 import de.westnordost.osmapi.common.ListHandler
 import mu.KotlinLogging
