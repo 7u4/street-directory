@@ -1,6 +1,6 @@
 package de.debuglevel.streetlister.overpass
 
-import de.debuglevel.commons.wait.WaitUtils
+import de.debuglevel.microservicecommons.wait.WaitUtils
 import de.westnordost.osmapi.OsmConnection
 import de.westnordost.osmapi.overpass.OverpassMapDataDao
 import mu.KotlinLogging
