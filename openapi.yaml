@@ -265,6 +265,12 @@ components:
           type: string
           description: A note which might be available from some providers
           nullable: true
+        lastStreetExtractionOn:
+          type: string
+          description: DateTime when the last attempt to street extraction was made;
+            null if not yet attempted.
+          format: date-time
+          nullable: true
         createdOn:
           type: string
           description: When created in the database
@@ -298,6 +304,12 @@ components:
           type: string
           description: A note which might be available from some providers
           nullable: true
+        lastStreetExtractionOn:
+          type: string
+          description: DateTime when the last attempt to street extraction was made;
+            null if not yet attempted.
+          format: date-time
+          nullable: true
         createdOn:
           type: string
           description: When created in the database
@@ -325,6 +337,12 @@ components:
         note:
           type: string
           description: A note which might be available from some providers
+          nullable: true
+        lastStreetExtractionOn:
+          type: string
+          description: DateTime when the last attempt to street extraction was made;
+            null if not yet attempted.
+          format: date-time
           nullable: true
     void:
       type: object
