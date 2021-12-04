@@ -113,8 +113,8 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
         }
     }
 
-    @Post("/populate")
-    fun populate() {
-        postalcodeService.populate()
+    @Post("/populate{?areaId}")
+    fun populate(areaId: Long) {
+        postalcodeService.populate(areaId)
     }
 }

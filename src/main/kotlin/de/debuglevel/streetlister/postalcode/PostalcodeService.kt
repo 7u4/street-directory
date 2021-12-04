@@ -86,19 +86,13 @@ class PostalcodeService(
         logger.debug { "Deleted $countDeleted of $countBefore postalcodes, $countAfter remaining" }
     }
 
-    fun populate() {
-        logger.debug { "Populating postal codes..." }
-        val areaIds = mapOf(
-            "Germany" to 3600051477,
-            "Bavaria" to 3602145268,
-            "Upper Frankonia" to 3600017592,
-        )
-        val areaId = areaIds["Germany"]!!
+    fun populate(areaId: Long) {
+        logger.debug { "Populating postal codes for area '$areaId'..." }
         val postalcodes = postalcodeExtractor.getPostalcodes(OverpassPostalcodeExtractorSettings(areaId))
 
         postalcodes.forEach { addOrUpdate(it) }
 
-        logger.debug { "Populated ${postalcodes.count()} postal codes" }
+        logger.debug { "Populated ${postalcodes.count()} postal codes for area '$areaId'" }
     }
 
     private fun exists(id: UUID): Boolean {

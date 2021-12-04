@@ -27,8 +27,14 @@ via [OpenAPI Generator](https://openapi-generator.tech).
 ### Start populating postal codes
 
 ```bash
-$ curl --location --request POST 'http://localhost:8080/postalcodes/populate'
+$ curl --location --request POST 'http://localhost:8080/postalcodes/populate?areaId=3600051477'
 ```
+
+Where `areaId` is the appropriate OSM area which meets some conditions, e.g.:
+
+* Germany: 3600051477
+* Bavaria: 3602145268
+* Upper Frankonia: 3600017592
 
 ### Get postal codes
 
@@ -54,7 +60,7 @@ $ curl --location --request GET 'http://localhost:8080/postalcodes/'
 ### Start populating streets
 
 ```bash
-$ curl --location --request POST 'http://localhost:8080/streets/populate'
+$ curl --location --request POST 'http://localhost:8080/streets/populate?areaId=3600051477'
 ```
 
 ### Get streets

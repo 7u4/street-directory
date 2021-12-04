@@ -124,14 +124,8 @@ class StreetService(
         logger.debug { "Deleted $countDeleted of $countBefore streets, $countAfter remaining" }
     }
 
-    fun populate() {
-        logger.debug { "Populating streets..." }
-        val areaIds = mapOf(
-            "Germany" to 3600051477,
-            "Bavaria" to 3602145268,
-            "Upper Frankonia" to 3600017592,
-        )
-        val areaId = areaIds["Germany"]!!
+    fun populate(areaId: Long) {
+        logger.debug { "Populating streets for area '$areaId'..." }
 
         postalcodeService.list().forEach { postalcode ->
             logger.debug { "Enqueuing $postalcode..." }
@@ -152,7 +146,7 @@ class StreetService(
             }
         }
 
-        logger.debug { "Populated streets" }
+        logger.debug { "Populated streets for area '$areaId'" }
     }
 
     private fun exists(id: UUID): Boolean {

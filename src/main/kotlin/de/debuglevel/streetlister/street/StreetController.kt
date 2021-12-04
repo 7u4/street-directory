@@ -120,8 +120,8 @@ class StreetController(private val streetService: StreetService) {
         }
     }
 
-    @Post("/populate")
-    fun populate() {
-        streetService.populate()
+    @Post("/populate{?areaId}")
+    fun populate(areaId: Long) {
+        streetService.populate(areaId)
     }
 }
