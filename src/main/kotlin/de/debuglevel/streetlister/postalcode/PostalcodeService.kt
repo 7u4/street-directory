@@ -19,7 +19,7 @@ class PostalcodeService(
 
         val postalcode: Postalcode = postalcodeRepository.findById(id).orElseThrow {
             logger.debug { "Getting postalcode with ID '$id' failed" }
-            EntityNotFoundException(id)
+            ItemNotFoundException(id)
         }
 
         logger.debug { "Got postalcode with ID '$id': $postalcode" }
@@ -69,7 +69,7 @@ class PostalcodeService(
         if (postalcodeRepository.existsById(id)) {
             postalcodeRepository.deleteById(id)
         } else {
-            throw EntityNotFoundException(id)
+            throw ItemNotFoundException(id)
         }
 
         logger.debug { "Deleted postalcode with ID '$id'" }
@@ -120,5 +120,5 @@ class PostalcodeService(
         }
     }
 
-    class EntityNotFoundException(criteria: Any) : Exception("Entity '$criteria' does not exist.")
+    class ItemNotFoundException(criteria: Any) : Exception("Item '$criteria' does not exist.")
 }

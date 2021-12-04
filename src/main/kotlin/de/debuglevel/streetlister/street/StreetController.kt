@@ -55,7 +55,7 @@ class StreetController(private val streetService: StreetService) {
 
             val getStreetResponse = GetStreetResponse(street)
             HttpResponse.ok(getStreetResponse)
-        } catch (e: StreetService.EntityNotFoundException) {
+        } catch (e: StreetService.ItemNotFoundException) {
             logger.debug { "Getting street $id failed: ${e.message}" }
             HttpResponse.notFound()
         } catch (e: Exception) {
@@ -76,7 +76,7 @@ class StreetController(private val streetService: StreetService) {
             streetService.delete(id)
 
             HttpResponse.noContent()
-        } catch (e: StreetService.EntityNotFoundException) {
+        } catch (e: StreetService.ItemNotFoundException) {
             HttpResponse.notFound()
         } catch (e: Exception) {
             logger.error(e) { "Unhandled exception" }

@@ -49,7 +49,7 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
 
             val getPostalcodeResponse = GetPostalcodeResponse(postalcode)
             HttpResponse.ok(getPostalcodeResponse)
-        } catch (e: PostalcodeService.EntityNotFoundException) {
+        } catch (e: PostalcodeService.ItemNotFoundException) {
             logger.debug { "Getting postalcode $id failed: ${e.message}" }
             HttpResponse.notFound()
         } catch (e: Exception) {
@@ -69,7 +69,7 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
             postalcodeService.delete(id)
 
             HttpResponse.noContent()
-        } catch (e: PostalcodeService.EntityNotFoundException) {
+        } catch (e: PostalcodeService.ItemNotFoundException) {
             HttpResponse.notFound()
         } catch (e: Exception) {
             logger.error(e) { "Unhandled exception" }

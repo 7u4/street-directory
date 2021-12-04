@@ -28,7 +28,7 @@ class StreetService(
 
         val street: Street = streetRepository.findById(id).orElseThrow {
             logger.debug { "Getting street with ID '$id' failed" }
-            EntityNotFoundException(id)
+            ItemNotFoundException(id)
         }
 
         logger.debug { "Got street with ID '$id': $street" }
@@ -55,10 +55,10 @@ class StreetService(
             getAll(postalcode, streetname).single()
         } catch (e: NoSuchElementException) {
             logger.debug { "Getting street with postalcode=$postalcode, streetname=$streetname failed" }
-            throw EntityNotFoundException("postalcode=$postalcode, streetname=$streetname")
+            throw ItemNotFoundException("postalcode=$postalcode, streetname=$streetname")
         } catch (e: IllegalArgumentException) {
             logger.debug { "Getting street with postalcode=$postalcode, streetname=$streetname failed" }
-            throw MultipleEntitiesFoundException("postalcode=$postalcode, streetname=$streetname")
+            throw MultipleItemsFoundException("postalcode=$postalcode, streetname=$streetname")
         }
 
         logger.debug { "Got street with postalcode=$postalcode, streetname=$streetname: $street" }
@@ -107,7 +107,7 @@ class StreetService(
         if (streetRepository.existsById(id)) {
             streetRepository.deleteById(id)
         } else {
-            throw EntityNotFoundException(id)
+            throw ItemNotFoundException(id)
         }
 
         logger.debug { "Deleted street with ID '$id'" }
@@ -169,11 +169,11 @@ class StreetService(
         try {
             val existingStreet = get(street.postalcode, street.streetname)
             this.update(existingStreet.id!!, street)
-        } catch (e: EntityNotFoundException) {
+        } catch (e: ItemNotFoundException) {
             this.add(street)
         }
     }
 
-    class EntityNotFoundException(criteria: Any) : Exception("Entity '$criteria' does not exist.")
-    class MultipleEntitiesFoundException(criteria: Any) : Exception("More than one item meets '$criteria'.")
+    class ItemNotFoundException(criteria: Any) : Exception("Item '$criteria' does not exist.")
+    class MultipleItemsFoundException(criteria: Any) : Exception("More than one item meets '$criteria'.")
 }
