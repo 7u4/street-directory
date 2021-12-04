@@ -2,7 +2,6 @@ package de.debuglevel.streetlister.postalcode
 
 import de.debuglevel.streetlister.postalcode.extraction.OverpassPostalcodeExtractorSettings
 import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractor
-import io.micronaut.data.exceptions.EmptyResultException
 import mu.KotlinLogging
 import java.util.*
 import javax.inject.Singleton
@@ -19,10 +18,22 @@ class PostalcodeService(
 
         val postalcode: Postalcode = postalcodeRepository.findById(id).orElseThrow {
             logger.debug { "Getting postalcode with ID '$id' failed" }
-            ItemNotFoundException(id)
+            ItemNotFoundException("id=$id")
         }
 
         logger.debug { "Got postalcode with ID '$id': $postalcode" }
+        return postalcode
+    }
+
+    fun get(code: String): Postalcode {
+        logger.debug { "Getting postalcode with code '$code'..." }
+
+        val postalcode: Postalcode = postalcodeRepository.find(code).orElseThrow {
+            logger.debug { "Getting postalcode with code '$code' failed" }
+            ItemNotFoundException("code=$code")
+        }
+
+        logger.debug { "Got postalcode with code '$code': $postalcode" }
         return postalcode
     }
 
@@ -54,12 +65,12 @@ class PostalcodeService(
         return updatedPostalcode
     }
 
-    fun list(): Set<Postalcode> {
+    fun getAll(): Set<Postalcode> {
         logger.debug { "Getting all postalcodes ..." }
 
         val postalcodes = postalcodeRepository.findAll().toSet()
 
-        logger.debug { "Got all postalcodes" }
+        logger.debug { "Got ${postalcodes.size} postalcodes" }
         return postalcodes
     }
 
@@ -113,9 +124,9 @@ class PostalcodeService(
         logger.debug { "Adding or updating $postalcode..." }
 
         try {
-            val existingPostalcode = postalcodeRepository.find(postalcode.code)
+            val existingPostalcode = this.get(postalcode.code)
             this.update(existingPostalcode.id!!, postalcode)
-        } catch (e: EmptyResultException) {
+        } catch (e: ItemNotFoundException) {
             this.add(postalcode)
         }
     }

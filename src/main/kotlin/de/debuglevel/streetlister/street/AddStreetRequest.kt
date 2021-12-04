@@ -1,5 +1,7 @@
 package de.debuglevel.streetlister.street
 
+import de.debuglevel.streetlister.postalcode.Postalcode
+
 data class AddStreetRequest(
     /**
      * The postal code
@@ -18,10 +20,10 @@ data class AddStreetRequest(
      */
     var centerLongitude: Double?,
 ) {
-    fun toStreet(): Street {
+    fun toStreet(postalcodeObj: Postalcode): Street {
         return Street(
             id = null,
-            postalcode = postalcode,
+            postalcode = postalcodeObj,
             streetname = streetname,
             centerLatitude = centerLatitude,
             centerLongitude = centerLongitude,

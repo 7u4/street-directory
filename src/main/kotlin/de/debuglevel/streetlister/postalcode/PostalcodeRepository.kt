@@ -6,6 +6,6 @@ import java.util.*
 
 @Repository
 interface PostalcodeRepository : CrudRepository<Postalcode, UUID> {
-    fun find(code: String): Postalcode
+    fun find(code: String): Optional<Postalcode>
     fun existsByCode(code: String): Boolean
 }

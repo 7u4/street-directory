@@ -36,7 +36,7 @@ data class GetStreetResponse(
 ) {
     constructor(street: Street) : this(
         street.id!!,
-        street.postalcode,
+        street.postalcode.code,
         street.streetname,
         street.centerLatitude,
         street.centerLongitude,

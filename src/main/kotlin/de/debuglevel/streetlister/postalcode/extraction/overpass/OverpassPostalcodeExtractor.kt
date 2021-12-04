@@ -34,15 +34,20 @@ class OverpassPostalcodeExtractor(
     }
 
     private fun executeQuery(areaId: Long): List<Postalcode> {
+        logger.trace { "Executing query for areaId=$areaId" }
+
         val postalcodeListHandler = PostalcodeListHandler()
         val query = buildQuery(areaId, serverTimeout)
 
         val postalcodes = overpassService.execute(query, postalcodeListHandler, serverTimeout)
 
+        logger.trace { "Executed query for areaId=$areaId: ${postalcodes.size} postal codes" }
         return postalcodes
     }
 
     private fun buildQuery(areaId: Long, timeout: Duration? = null): String {
+        logger.trace { "Building query for areaId=$areaId" }
+
         var query = ""
         query += OverpassQueryBuilder.timeout(timeout)
         query += OverpassQueryBuilder.csvOutput(
@@ -56,6 +61,9 @@ class OverpassPostalcodeExtractor(
             relation["boundary"="postal_code"](area);
             out center;
                """
-        return query.trimIndent()
+        query = query.trimIndent()
+
+        logger.trace { "Built query for areaId=$areaId: $query" }
+        return query
     }
 }

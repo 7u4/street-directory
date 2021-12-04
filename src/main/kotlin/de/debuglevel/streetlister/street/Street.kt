@@ -1,14 +1,12 @@
 package de.debuglevel.streetlister.street
 
+import de.debuglevel.streetlister.postalcode.Postalcode
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.DateUpdated
 import org.hibernate.annotations.GenericGenerator
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 data class Street(
@@ -21,9 +19,10 @@ data class Street(
     @Column(columnDefinition = "BINARY(16)")
     var id: UUID?,
     /**
-     * The postal code
+     * The [Postalcode] of this [Street].
      */
-    var postalcode: String,
+    @ManyToOne()
+    var postalcode: Postalcode,
     /**
      * The name of the street
      */
@@ -46,4 +45,23 @@ data class Street(
      */
     @DateUpdated
     var lastModifiedOn: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    override fun toString(): String {
+        return "Street(id=$id, streetname='$streetname')"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Street
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
+}

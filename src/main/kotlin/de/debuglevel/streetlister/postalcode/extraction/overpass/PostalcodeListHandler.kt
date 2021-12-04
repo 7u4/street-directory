@@ -38,6 +38,7 @@ class PostalcodeListHandler : ListHandler<Array<String>>(), OverpassResultHandle
                 Postalcode(
                     id = null,
                     code = code,
+                    streets = listOf(),
                     centerLatitude = latitude,
                     centerLongitude = longitude,
                     note = note

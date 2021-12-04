@@ -28,6 +28,7 @@ data class AddPostalcodeRequest(
         return Postalcode(
             id = null,
             code = code,
+            streets = listOf(),
             centerLatitude = centerLatitude,
             centerLongitude = centerLongitude,
             note = note,

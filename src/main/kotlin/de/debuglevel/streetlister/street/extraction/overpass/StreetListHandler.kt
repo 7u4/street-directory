@@ -3,6 +3,7 @@ package de.debuglevel.streetlister.street.extraction.overpass
 import de.debuglevel.openstreetmap.overpass.EmptyResultSetException
 import de.debuglevel.openstreetmap.overpass.InvalidResultSetException
 import de.debuglevel.openstreetmap.overpass.OverpassResultHandler
+import de.debuglevel.streetlister.postalcode.Postalcode
 import de.debuglevel.streetlister.street.Street
 import de.westnordost.osmapi.common.ListHandler
 import mu.KotlinLogging
@@ -11,7 +12,7 @@ class StreetListHandler(
     /**
      * Postal code that will be assigned to every street by this Handler
      */
-    private val postalcode: String
+    private val postalcode: Postalcode
 ) : ListHandler<Array<String>>(), OverpassResultHandler<Street> {
     private val logger = KotlinLogging.logger {}
 

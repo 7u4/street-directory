@@ -161,7 +161,7 @@ dependencies {
     // Debuglevel Microservice Commons
     implementation "com.github.debuglevel:microservice-commons:f24dd3964f" // via jitpack
     //implementation "de.debuglevel.commons.openstreetmap:openstreetmap-commons:0.0.1-SNAPSHOT" // via mavenLocal
-    implementation 'com.github.debuglevel:openstreetmap-commons:61613e8b65' // via jitpack
+    implementation 'com.github.debuglevel:openstreetmap-commons:3c12551d43' // via jitpack
 }
 
 // Java configuration

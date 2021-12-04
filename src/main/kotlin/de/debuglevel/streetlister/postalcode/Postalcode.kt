@@ -1,14 +1,12 @@
 package de.debuglevel.streetlister.postalcode
 
+import de.debuglevel.streetlister.street.Street
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.DateUpdated
 import org.hibernate.annotations.GenericGenerator
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 data class Postalcode(
@@ -24,6 +22,11 @@ data class Postalcode(
      * The actual value of the postal code
      */
     var code: String,
+    /**
+     * The [Street]s associated with this [Postalcode].
+     */
+    @OneToMany(mappedBy = "postalcode")
+    var streets: List<Street>,
     /**
      * Latitude of the center of the postal code area
      */
@@ -50,4 +53,23 @@ data class Postalcode(
      */
     @DateUpdated
     var lastModifiedOn: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    override fun toString(): String {
+        return "Postalcode(id=$id, code='$code')"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Postalcode
+
+        if (code != other.code) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return code.hashCode()
+    }
+}

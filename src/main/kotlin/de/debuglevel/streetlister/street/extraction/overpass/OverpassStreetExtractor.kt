@@ -2,6 +2,7 @@ package de.debuglevel.streetlister.street.extraction.overpass
 
 import de.debuglevel.openstreetmap.overpass.OverpassQueryBuilder
 import de.debuglevel.streetlister.overpass.OverpassService
+import de.debuglevel.streetlister.postalcode.Postalcode
 import de.debuglevel.streetlister.street.Street
 import de.debuglevel.streetlister.street.extraction.OverpassStreetExtractorSettings
 import de.debuglevel.streetlister.street.extraction.StreetExtractor
@@ -27,15 +28,15 @@ class OverpassStreetExtractor(
         logger.debug { "Getting streets for postal code ${streetExtractorSettings.postalcode}..." }
 
         val streets = executeQuery(streetExtractorSettings.areaId, streetExtractorSettings.postalcode)
-            .sortedBy { it.postalcode }
+            .sortedBy { it.postalcode.code }
 
         logger.debug { "Got ${streets.count()} postal codes" }
         return streets
     }
 
-    private fun executeQuery(areaId: Long, postalcode: String): List<Street> {
+    private fun executeQuery(areaId: Long, postalcode: Postalcode): List<Street> {
         val streetListHandler = StreetListHandler(postalcode)
-        val query = buildQuery(areaId, postalcode, serverTimeout)
+        val query = buildQuery(areaId, postalcode.code, serverTimeout)
 
         val streets = overpassService.execute(query, streetListHandler, serverTimeout)
 

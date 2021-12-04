@@ -10,9 +10,10 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import javax.inject.Singleton
+import javax.transaction.Transactional
 
 @Singleton
-class StreetService(
+open class StreetService(
     private val streetRepository: StreetRepository,
     private val streetExtractor: StreetExtractor,
     private val postalcodeService: PostalcodeService,
@@ -28,37 +29,32 @@ class StreetService(
 
         val street: Street = streetRepository.findById(id).orElseThrow {
             logger.debug { "Getting street with ID '$id' failed" }
-            ItemNotFoundException(id)
+            PostalcodeService.ItemNotFoundException(id)
         }
 
         logger.debug { "Got street with ID '$id': $street" }
         return street
     }
 
-    fun getAll(postalcode: String, streetname: String?): List<Street> {
-        logger.debug { "Getting streets with postalcode=$postalcode, streetname=$streetname..." }
+    /**
+     * Get the [Street] named [streetname] in [postalcode].
+     */
+    fun get(postalcodeId: UUID, streetname: String): Street {
+        logger.debug { "Getting street with postalcodeId=$postalcodeId, streetname=$streetname..." }
 
-        val streets = if (streetname != null) {
-            streetRepository.find(postalcode, streetname)
-        } else {
-            streetRepository.find(postalcode)
-        }
-
-        logger.debug { "Got ${streets.count()} streets with postalcode=$postalcode, streetname=$streetname" }
-        return streets
-    }
-
-    fun get(postalcode: String, streetname: String): Street {
-        logger.debug { "Getting street with postalcode=$postalcode, streetname=$streetname..." }
+        val postalcode = postalcodeService.get(postalcodeId)
 
         val street = try {
-            getAll(postalcode, streetname).single()
+            postalcode.streets.single { it.streetname == streetname }
         } catch (e: NoSuchElementException) {
-            logger.debug { "Getting street with postalcode=$postalcode, streetname=$streetname failed" }
+            logger.debug { "Getting street with postalcode=$postalcode, streetname=$streetname failed; not found" }
             throw ItemNotFoundException("postalcode=$postalcode, streetname=$streetname")
         } catch (e: IllegalArgumentException) {
-            logger.debug { "Getting street with postalcode=$postalcode, streetname=$streetname failed" }
+            logger.debug { "Getting street with postalcode=$postalcode, streetname=$streetname failed; multiple found" }
             throw MultipleItemsFoundException("postalcode=$postalcode, streetname=$streetname")
+        } catch (e: Exception) {
+            logger.error(e) { "Unhandled exception" }
+            throw e
         }
 
         logger.debug { "Got street with postalcode=$postalcode, streetname=$streetname: $street" }
@@ -68,7 +64,11 @@ class StreetService(
     fun add(street: Street): Street {
         logger.debug { "Adding street '$street'..." }
 
-        val savedStreet = streetRepository.save(street)
+        // Get postalcode again to avoid detached entity
+        val postalcode = postalcodeService.get(street.postalcode.id!!)
+        val savingStreet = street.copy(postalcode = postalcode)
+
+        val savedStreet = streetRepository.save(savingStreet)
 
         logger.debug { "Added street: $savedStreet" }
         return savedStreet
@@ -77,10 +77,13 @@ class StreetService(
     fun update(id: UUID, street: Street): Street {
         logger.debug { "Updating street '$street' with ID '$id'..." }
 
+        // Get postalcode again to avoid detached entity
+        val postalcodeObj = postalcodeService.get(street.postalcode.id!!)
+
         // an object must be known to Hibernate (i.e. retrieved first) to get updated;
         // it would be a "detached entity" otherwise.
         val updateStreet = this.get(id).apply {
-            postalcode = street.postalcode
+            postalcode = postalcodeObj
             streetname = street.streetname
             centerLatitude = street.centerLatitude
             centerLongitude = street.centerLongitude
@@ -92,12 +95,12 @@ class StreetService(
         return updatedStreet
     }
 
-    fun list(): Set<Street> {
+    fun getAll(): Set<Street> {
         logger.debug { "Getting all streets ..." }
 
         val streets = streetRepository.findAll().toSet()
 
-        logger.debug { "Got all streets" }
+        logger.debug { "Got ${streets.size} streets" }
         return streets
     }
 
@@ -127,26 +130,41 @@ class StreetService(
     fun populate(areaId: Long) {
         logger.debug { "Populating streets for area '$areaId'..." }
 
-        postalcodeService.list().forEach { postalcode ->
-            logger.debug { "Enqueuing $postalcode..." }
+        postalcodeService.getAll().forEach { postalcode ->
+            logger.debug { "Enqueuing street population for postal code $postalcode..." }
             if (!queueMonitor.contains(postalcode)) {
                 val future = executor.submit {
-                    val streets = streetExtractor.getStreets(OverpassStreetExtractorSettings(areaId, postalcode.code))
-                    streets.forEach { street -> addOrUpdate(street) }
-
-                    postalcode.lastStreetExtractionOn = LocalDateTime.now()
-                    postalcodeService.update(postalcode.id!!, postalcode)
-
-                    queueMonitor.remove(postalcode)
+                    populate(postalcode, areaId)
                 }
                 queueMonitor[postalcode] = future
-                logger.debug { "Enqueued $postalcode" }
+                logger.debug { "Enqueued street population for postal code $postalcode" }
             } else {
-                logger.debug { "Not enqueued $postalcode as it was already on queue" }
+                logger.debug { "Not enqueued street population for postal code $postalcode as it was already in the queue" }
             }
         }
 
         logger.debug { "Populated streets for area '$areaId'" }
+    }
+
+    @Transactional
+    open fun populate(postalcode: Postalcode, areaId: Long) {
+        logger.debug { "Starting enqueued street population for postal code $postalcode..." }
+
+        try {
+            // Get streets from Overpass API
+            val streets = streetExtractor.getStreets(OverpassStreetExtractorSettings(areaId, postalcode))
+            // Add (or update) each street
+            streets.forEach { street -> addOrUpdate(street) }
+
+            // Update the last extraction datetime on the Postalcode
+            postalcode.lastStreetExtractionOn = LocalDateTime.now()
+            postalcodeService.update(postalcode.id!!, postalcode)
+        } catch (e: Exception) {
+            logger.error(e) { "Unhandled exception" }
+        }
+
+        queueMonitor.remove(postalcode)
+        logger.debug { "Enqueued street population for postal code $postalcode is done" }
     }
 
     private fun exists(id: UUID): Boolean {
@@ -156,18 +174,11 @@ class StreetService(
         return isExisting
     }
 
-    private fun exists(postalcode: String, streetname: String): Boolean {
-        logger.debug { "Checking if street '$streetname' in $postalcode exists..." }
-        val isExisting = streetRepository.existsByPostalcodeAndStreetname(postalcode, streetname)
-        logger.debug { "Checked if street '$streetname' in $postalcode exists: $isExisting" }
-        return isExisting
-    }
-
     private fun addOrUpdate(street: Street) {
         logger.debug { "Adding or updating $street..." }
 
         try {
-            val existingStreet = get(street.postalcode, street.streetname)
+            val existingStreet = get(street.postalcode.id!!, street.streetname)
             this.update(existingStreet.id!!, street)
         } catch (e: ItemNotFoundException) {
             this.add(street)

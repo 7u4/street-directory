@@ -1,5 +1,6 @@
 package de.debuglevel.streetlister.street
 
+import de.debuglevel.streetlister.postalcode.PostalcodeService
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Delete
@@ -14,23 +15,32 @@ import java.util.*
 @Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/streets")
 @Tag(name = "streets")
-class StreetController(private val streetService: StreetService) {
+class StreetController(
+    private val postalcodeService: PostalcodeService,
+    private val streetService: StreetService,
+) {
     private val logger = KotlinLogging.logger {}
 
     /**
-     * Get all streets
-     * @return All streets
+     * Get all [Street]s matching the [postalcode] and the [streetname].
      */
     @Get("/{?postalcode,streetname}")
     fun getAllStreets(postalcode: String?, streetname: String?): HttpResponse<List<GetStreetResponse>> {
         logger.debug("Called getAllStreets(postalcode=$postalcode, streetname=$streetname)")
 
         return try {
-            val streets = if (postalcode != null) {
-                streetService.getAll(postalcode, streetname)
+            val streets = if (!postalcode.isNullOrBlank()) {
+                val postalcodeObj = postalcodeService.get(postalcode)
+
+                if (!streetname.isNullOrBlank()) {
+                    listOfNotNull(streetService.get(postalcodeObj.id!!, streetname))
+                } else {
+                    postalcodeObj.streets
+                }
             } else {
-                streetService.list()
+                streetService.getAll()
             }
+
             val getStreetResponses = streets
                 .map { GetStreetResponse(it) }
 
@@ -109,7 +119,8 @@ class StreetController(private val streetService: StreetService) {
         logger.debug("Called postOneStreet($addStreetRequest)")
 
         return try {
-            val street = addStreetRequest.toStreet()
+            val postalcode = postalcodeService.get(addStreetRequest.postalcode)
+            val street = addStreetRequest.toStreet(postalcode)
             val addedStreet = streetService.add(street)
 
             val addStreetResponse = AddStreetResponse(addedStreet)
@@ -120,8 +131,11 @@ class StreetController(private val streetService: StreetService) {
         }
     }
 
-    @Post("/populate{?areaId}")
+    //@Post("/populate/{?areaId}") // Does not work, but would be nicer?
+    //@Post("/populate{?areaId}") // Does not work, but would be nicer?
+    @Post("/populate/{areaId}")
     fun populate(areaId: Long) {
+        logger.debug { "Called populate($areaId)" }
         streetService.populate(areaId)
     }
 }

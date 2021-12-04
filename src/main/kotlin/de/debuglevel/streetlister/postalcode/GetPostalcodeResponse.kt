@@ -12,6 +12,10 @@ data class GetPostalcodeResponse(
      */
     var code: String,
     /**
+     * Number of streets associated with this postal code
+     */
+    var streetsCount: Int,
+    /**
      * Latitude of the center of the postal code area
      */
     var centerLatitude: Double?,
@@ -41,6 +45,7 @@ data class GetPostalcodeResponse(
     constructor(postalcode: Postalcode) : this(
         postalcode.id!!,
         postalcode.code,
+        postalcode.streets.size,
         postalcode.centerLatitude,
         postalcode.centerLongitude,
         postalcode.note,

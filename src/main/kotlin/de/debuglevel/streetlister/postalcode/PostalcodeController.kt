@@ -10,22 +10,26 @@ import io.micronaut.security.rules.SecurityRule
 import io.swagger.v3.oas.annotations.tags.Tag
 import mu.KotlinLogging
 import java.util.*
+import javax.transaction.Transactional
 
 @Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/postalcodes")
 @Tag(name = "postalcodes")
-class PostalcodeController(private val postalcodeService: PostalcodeService) {
+open class PostalcodeController(
+    private val postalcodeService: PostalcodeService
+) {
     private val logger = KotlinLogging.logger {}
 
     /**
-     * Get all postalcodes
-     * @return All postalcodes
+     * Get all [Postalcode]s
+     * @return All [Postalcode]s
      */
     @Get("/")
-    fun getAllPostalcodes(): HttpResponse<List<GetPostalcodeResponse>> {
+    @Transactional
+    open fun getAllPostalcodes(): HttpResponse<List<GetPostalcodeResponse>> {
         logger.debug("Called getAllPostalcodes()")
         return try {
-            val postalcodes = postalcodeService.list()
+            val postalcodes = postalcodeService.getAll()
             val getPostalcodeResponses = postalcodes
                 .map { GetPostalcodeResponse(it) }
 
@@ -37,9 +41,9 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
     }
 
     /**
-     * Get a postalcode
-     * @param id ID of the postalcode
-     * @return A postalcode
+     * Get a [Postalcode]
+     * @param id ID of the [Postalcode]
+     * @return A [Postalcode]
      */
     @Get("/{id}")
     fun getOnePostalcode(id: UUID): HttpResponse<GetPostalcodeResponse> {
@@ -59,8 +63,8 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
     }
 
     /**
-     * Delete a postalcode.
-     * @param id ID of the postalcode
+     * Delete a [Postalcode].
+     * @param id ID of the [Postalcode]
      */
     @Delete("/{id}")
     fun deleteOnePostalcode(id: UUID): HttpResponse<Unit> {
@@ -78,7 +82,7 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
     }
 
     /**
-     * Delete all postalcodes.
+     * Delete all [Postalcode]s.
      */
     @Delete("/")
     fun deleteAllPostalcodes(): HttpResponse<Unit> {
@@ -94,7 +98,7 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
     }
 
     /**
-     * Create a postalcode.
+     * Create a [Postalcode].
      * This is not meant for productive use, but rather for uploading backups.
      */
     @Post("/")
@@ -113,8 +117,11 @@ class PostalcodeController(private val postalcodeService: PostalcodeService) {
         }
     }
 
-    @Post("/populate{?areaId}")
+    //@Post("/populate/{?areaId}") // Does not work, but would be nicer?
+    //@Post("/populate{?areaId}") // Does not work, but would be nicer?
+    @Post("/populate/{areaId}")
     fun populate(areaId: Long) {
+        logger.debug { "Called populate($areaId)" }
         postalcodeService.populate(areaId)
     }
 }
