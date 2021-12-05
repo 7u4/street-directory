@@ -134,7 +134,9 @@ open class StreetService(
             logger.debug { "Enqueuing street population for postal code $postalcode..." }
             if (!queueMonitor.contains(postalcode)) {
                 val future = executor.submit {
+                    logger.debug { "Starting enqueued street population for postal code $postalcode..." }
                     populate(postalcode, areaId)
+                    logger.debug { "Ended enqueued street population for postal code $postalcode" }
                 }
                 queueMonitor[postalcode] = future
                 logger.debug { "Enqueued street population for postal code $postalcode" }
