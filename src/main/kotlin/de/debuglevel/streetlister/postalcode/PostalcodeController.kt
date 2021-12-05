@@ -107,7 +107,7 @@ open class PostalcodeController(
 
         return try {
             val postalcode = addPostalcodeRequest.toPostalcode()
-            val addedPostalcode = postalcodeService.add(postalcode)
+            val addedPostalcode = postalcodeService.updateOrAdd(postalcode)
 
             val addPostalcodeResponse = AddPostalcodeResponse(addedPostalcode)
             HttpResponse.created(addPostalcodeResponse)

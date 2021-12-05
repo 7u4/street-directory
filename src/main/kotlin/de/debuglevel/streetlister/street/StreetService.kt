@@ -154,7 +154,7 @@ open class StreetService(
             // Get streets from Overpass API
             val streets = streetExtractor.getStreets(OverpassStreetExtractorSettings(areaId, postalcode))
             // Add (or update) each street
-            streets.forEach { street -> addOrUpdate(street) }
+            streets.forEach { street -> updateOrAdd(street) }
 
             // Update the last extraction datetime on the Postalcode
             postalcode.lastStreetExtractionOn = LocalDateTime.now()
@@ -174,10 +174,10 @@ open class StreetService(
         return isExisting
     }
 
-    private fun addOrUpdate(street: Street) {
-        logger.debug { "Adding or updating $street..." }
+    private fun updateOrAdd(street: Street): Street {
+        logger.debug { "Updating or adding $street..." }
 
-        try {
+        return try {
             val existingStreet = get(street.postalcode.id!!, street.streetname)
             this.update(existingStreet.id!!, street)
         } catch (e: ItemNotFoundException) {

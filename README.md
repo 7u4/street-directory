@@ -119,6 +119,16 @@ $ curl --location --request GET 'http://localhost:8080/streets/?postalcode=91094
 ]
 ```
 
+## Backup and Restore
+
+Backup and restore is done by dumping everything into JSON files and upload it again.
+
+To backup postal codes, run `supplemental/backup/backup-postalcodes.sh` and `supplemental/backup/backup-streets.sh`. In
+a fully populated database (e.g. whole Germany), this probably creates quite big JSON files.
+
+To restore them, first all postal codes and then all streets have to be POSTed.
+Run `supplemental/backup/restore-postalcodes.sh` and `supplemental/backup/restore-streets.sh`
+
 # Configuration
 
 There is a `application.yml` included in the jar file. Its content can be modified and saved as a

@@ -101,7 +101,7 @@ class PostalcodeService(
         logger.debug { "Populating postal codes for area '$areaId'..." }
         val postalcodes = postalcodeExtractor.getPostalcodes(OverpassPostalcodeExtractorSettings(areaId))
 
-        postalcodes.forEach { addOrUpdate(it) }
+        postalcodes.forEach { updateOrAdd(it) }
 
         logger.debug { "Populated ${postalcodes.count()} postal codes for area '$areaId'" }
     }
@@ -120,10 +120,10 @@ class PostalcodeService(
         return isExisting
     }
 
-    private fun addOrUpdate(postalcode: Postalcode) {
-        logger.debug { "Adding or updating $postalcode..." }
+    fun updateOrAdd(postalcode: Postalcode): Postalcode {
+        logger.debug { "Updating or adding $postalcode..." }
 
-        try {
+        return try {
             val existingPostalcode = this.get(postalcode.code)
             this.update(existingPostalcode.id!!, postalcode)
         } catch (e: ItemNotFoundException) {
