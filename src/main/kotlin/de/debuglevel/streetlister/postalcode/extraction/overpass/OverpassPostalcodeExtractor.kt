@@ -10,7 +10,7 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Requires
 import mu.KotlinLogging
 import java.time.Duration
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 @Requires(property = "app.street-lister.postalcodes.extractors.overpass.enabled", value = "true")

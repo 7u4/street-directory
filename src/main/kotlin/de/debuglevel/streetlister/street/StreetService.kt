@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.transaction.Transactional
 
 @Singleton

@@ -4,7 +4,7 @@ import de.debuglevel.streetlister.postalcode.extraction.OverpassPostalcodeExtrac
 import de.debuglevel.streetlister.postalcode.extraction.PostalcodeExtractor
 import mu.KotlinLogging
 import java.util.*
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class PostalcodeService(

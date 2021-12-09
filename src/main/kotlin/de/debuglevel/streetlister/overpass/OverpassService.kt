@@ -6,7 +6,7 @@ import de.debuglevel.openstreetmap.overpass.OverpassResultHandler
 import mu.KotlinLogging
 import java.time.Duration
 import java.util.concurrent.Executors
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class OverpassService(

@@ -14,13 +14,13 @@ paths:
     get:
       tags:
       - postalcodes
-      summary: Get all postalcodes
-      description: Get all postalcodes
+      summary: "Get all [Postalcode]s"
+      description: "Get all [Postalcode]s"
       operationId: getAllPostalcodes
       parameters: []
       responses:
-        default:
-          description: All postalcodes
+        "200":
+          description: "All [Postalcode]s"
           content:
             application/json:
               schema:
@@ -30,23 +30,27 @@ paths:
     post:
       tags:
       - postalcodes
-      summary: "Create a postalcode.\n This is not meant for productive use, but rather\
-        \ for uploading backups."
-      description: "Create a postalcode.\n This is not meant for productive use, but\
-        \ rather for uploading backups."
+      summary: |-
+        Create a [Postalcode].
+         This is not meant for productive use, but rather for uploading backups.
+      description: |-
+        Create a [Postalcode].
+         This is not meant for productive use, but rather for uploading backups.
       operationId: postOnePostalcode
       parameters: []
       requestBody:
         content:
           application/json:
             schema:
+              required:
+              - addPostalcodeRequest
               type: object
               properties:
                 addPostalcodeRequest:
                   $ref: '#/components/schemas/AddPostalcodeRequest'
         required: true
       responses:
-        default:
+        "200":
           content:
             application/json:
               schema:
@@ -54,34 +58,49 @@ paths:
     delete:
       tags:
       - postalcodes
-      summary: Delete all postalcodes.
-      description: Delete all postalcodes.
+      summary: "Delete all [Postalcode]s."
+      description: "Delete all [Postalcode]s."
       operationId: deleteAllPostalcodes
       parameters: []
       responses:
-        default:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unit'
+  /postalcodes/populate/{areaId}:
+    post:
+      tags:
+      - postalcodes
+      operationId: populate
+      parameters:
+      - name: areaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: populate 200 response
   /postalcodes/{id}:
     get:
       tags:
       - postalcodes
-      summary: Get a postalcode
-      description: Get a postalcode
+      summary: "Get a [Postalcode]"
+      description: "Get a [Postalcode]"
       operationId: getOnePostalcode
       parameters:
       - name: id
         in: path
-        description: ID of the postalcode
+        description: "ID of the [Postalcode]"
         required: true
         schema:
           type: string
           format: uuid
       responses:
-        default:
-          description: A postalcode
+        "200":
+          description: "A [Postalcode]"
           content:
             application/json:
               schema:
@@ -89,42 +108,29 @@ paths:
     delete:
       tags:
       - postalcodes
-      summary: Delete a postalcode.
-      description: Delete a postalcode.
+      summary: "Delete a [Postalcode]."
+      description: "Delete a [Postalcode]."
       operationId: deleteOnePostalcode
       parameters:
       - name: id
         in: path
-        description: ID of the postalcode
+        description: "ID of the [Postalcode]"
         required: true
         schema:
           type: string
           format: uuid
       responses:
-        default:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unit'
-  /postalcodes/populate:
-    post:
-      tags:
-      - postalcodes
-      operationId: populate
-      parameters: []
-      responses:
-        default:
-          description: populate default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/void'
   /streets:
     get:
       tags:
       - streets
-      summary: Get all streets
-      description: Get all streets
+      summary: "Get all [Street]s matching the [postalcode] and the [streetname]."
+      description: "Get all [Street]s matching the [postalcode] and the [streetname]."
       operationId: getAllStreets
       parameters:
       - name: postalcode
@@ -140,8 +146,7 @@ paths:
           type: string
           nullable: true
       responses:
-        default:
-          description: All streets
+        "200":
           content:
             application/json:
               schema:
@@ -151,23 +156,27 @@ paths:
     post:
       tags:
       - streets
-      summary: "Create a street.\n This is not meant for productive use, but rather\
-        \ for uploading backups."
-      description: "Create a street.\n This is not meant for productive use, but rather\
-        \ for uploading backups."
+      summary: |-
+        Create a street.
+         This is not meant for productive use, but rather for uploading backups.
+      description: |-
+        Create a street.
+         This is not meant for productive use, but rather for uploading backups.
       operationId: postOneStreet
       parameters: []
       requestBody:
         content:
           application/json:
             schema:
+              required:
+              - addStreetRequest
               type: object
               properties:
                 addStreetRequest:
                   $ref: '#/components/schemas/AddStreetRequest'
         required: true
       responses:
-        default:
+        "200":
           content:
             application/json:
               schema:
@@ -180,11 +189,26 @@ paths:
       operationId: deleteAllStreets
       parameters: []
       responses:
-        default:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unit'
+  /streets/populate/{areaId}:
+    post:
+      tags:
+      - streets
+      operationId: populate_1
+      parameters:
+      - name: areaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: populate_1 200 response
   /streets/{id}:
     get:
       tags:
@@ -201,7 +225,7 @@ paths:
           type: string
           format: uuid
       responses:
-        default:
+        "200":
           description: A street
           content:
             application/json:
@@ -222,27 +246,47 @@ paths:
           type: string
           format: uuid
       responses:
-        default:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unit'
-  /streets/populate:
-    post:
-      tags:
-      - streets
-      operationId: populate
-      parameters: []
-      responses:
-        default:
-          description: populate default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/void'
 components:
   schemas:
-    GetPostalcodeResponse:
+    AddPostalcodeRequest:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The actual value of the postal code
+        centerLatitude:
+          type: number
+          description: Latitude of the center of the postal code area
+          format: double
+          nullable: true
+        centerLongitude:
+          type: number
+          description: Longitude of the center of the postal code area
+          format: double
+          nullable: true
+        note:
+          type: string
+          description: A note which might be available from some providers
+          nullable: true
+        lastStreetExtractionOn:
+          type: string
+          description: DateTime when the last attempt to street extraction was made;
+            null if not yet attempted.
+          format: date-time
+          nullable: true
+    AddPostalcodeResponse:
+      required:
+      - code
+      - createdOn
+      - id
+      - lastModifiedOn
       type: object
       properties:
         id:
@@ -270,6 +314,147 @@ components:
           description: DateTime when the last attempt to street extraction was made;
             null if not yet attempted.
           format: date-time
+          nullable: true
+        createdOn:
+          type: string
+          description: When created in the database
+          format: date-time
+        lastModifiedOn:
+          type: string
+          description: When last modified in the database
+          format: date-time
+    AddStreetRequest:
+      required:
+      - postalcode
+      - streetname
+      type: object
+      properties:
+        postalcode:
+          type: string
+          description: The postal code
+        streetname:
+          type: string
+          description: The name of the street
+        centerLatitude:
+          type: number
+          description: Latitude of the center of the postal code area
+          format: double
+          nullable: true
+        centerLongitude:
+          type: number
+          description: Longitude of the center of the postal code area
+          format: double
+          nullable: true
+    AddStreetResponse:
+      required:
+      - createdOn
+      - id
+      - lastModifiedOn
+      - postalcode
+      - streetname
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        postalcode:
+          type: string
+          description: The postal code
+        streetname:
+          type: string
+          description: The name of the street
+        centerLatitude:
+          type: number
+          description: Latitude of the center of the postal code area
+          format: double
+          nullable: true
+        centerLongitude:
+          type: number
+          description: Longitude of the center of the postal code area
+          format: double
+          nullable: true
+        createdOn:
+          type: string
+          description: When created in the database
+          format: date-time
+        lastModifiedOn:
+          type: string
+          description: When last modified in the database
+          format: date-time
+    GetPostalcodeResponse:
+      required:
+      - code
+      - createdOn
+      - id
+      - lastModifiedOn
+      - streetsCount
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: The actual value of the postal code
+        streetsCount:
+          type: integer
+          description: Number of streets associated with this postal code
+          format: int32
+        centerLatitude:
+          type: number
+          description: Latitude of the center of the postal code area
+          format: double
+          nullable: true
+        centerLongitude:
+          type: number
+          description: Longitude of the center of the postal code area
+          format: double
+          nullable: true
+        note:
+          type: string
+          description: A note which might be available from some providers
+          nullable: true
+        lastStreetExtractionOn:
+          type: string
+          description: DateTime when the last attempt to street extraction was made;
+            null if not yet attempted.
+          format: date-time
+          nullable: true
+        createdOn:
+          type: string
+          description: When created in the database
+          format: date-time
+        lastModifiedOn:
+          type: string
+          description: When last modified in the database
+          format: date-time
+    GetStreetResponse:
+      required:
+      - createdOn
+      - id
+      - lastModifiedOn
+      - postalcode
+      - streetname
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        postalcode:
+          type: string
+          description: The postal code
+        streetname:
+          type: string
+          description: The name of the street
+        centerLatitude:
+          type: number
+          description: Latitude of the center of the postal code area
+          format: double
+          nullable: true
+        centerLongitude:
+          type: number
+          description: Longitude of the center of the postal code area
+          format: double
           nullable: true
         createdOn:
           type: string
@@ -281,147 +466,3 @@ components:
           format: date-time
     Unit:
       type: object
-    AddPostalcodeResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        code:
-          type: string
-          description: The actual value of the postal code
-        centerLatitude:
-          type: number
-          description: Latitude of the center of the postal code area
-          format: double
-          nullable: true
-        centerLongitude:
-          type: number
-          description: Longitude of the center of the postal code area
-          format: double
-          nullable: true
-        note:
-          type: string
-          description: A note which might be available from some providers
-          nullable: true
-        lastStreetExtractionOn:
-          type: string
-          description: DateTime when the last attempt to street extraction was made;
-            null if not yet attempted.
-          format: date-time
-          nullable: true
-        createdOn:
-          type: string
-          description: When created in the database
-          format: date-time
-        lastModifiedOn:
-          type: string
-          description: When last modified in the database
-          format: date-time
-    AddPostalcodeRequest:
-      type: object
-      properties:
-        code:
-          type: string
-          description: The actual value of the postal code
-        centerLatitude:
-          type: number
-          description: Latitude of the center of the postal code area
-          format: double
-          nullable: true
-        centerLongitude:
-          type: number
-          description: Longitude of the center of the postal code area
-          format: double
-          nullable: true
-        note:
-          type: string
-          description: A note which might be available from some providers
-          nullable: true
-        lastStreetExtractionOn:
-          type: string
-          description: DateTime when the last attempt to street extraction was made;
-            null if not yet attempted.
-          format: date-time
-          nullable: true
-    void:
-      type: object
-    GetStreetResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        postalcode:
-          type: string
-          description: The postal code
-        streetname:
-          type: string
-          description: The name of the street
-        centerLatitude:
-          type: number
-          description: Latitude of the center of the postal code area
-          format: double
-          nullable: true
-        centerLongitude:
-          type: number
-          description: Longitude of the center of the postal code area
-          format: double
-          nullable: true
-        createdOn:
-          type: string
-          description: When created in the database
-          format: date-time
-        lastModifiedOn:
-          type: string
-          description: When last modified in the database
-          format: date-time
-    AddStreetResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        postalcode:
-          type: string
-          description: The postal code
-        streetname:
-          type: string
-          description: The name of the street
-        centerLatitude:
-          type: number
-          description: Latitude of the center of the postal code area
-          format: double
-          nullable: true
-        centerLongitude:
-          type: number
-          description: Longitude of the center of the postal code area
-          format: double
-          nullable: true
-        createdOn:
-          type: string
-          description: When created in the database
-          format: date-time
-        lastModifiedOn:
-          type: string
-          description: When last modified in the database
-          format: date-time
-    AddStreetRequest:
-      type: object
-      properties:
-        postalcode:
-          type: string
-          description: The postal code
-        streetname:
-          type: string
-          description: The name of the street
-        centerLatitude:
-          type: number
-          description: Latitude of the center of the postal code area
-          format: double
-          nullable: true
-        centerLongitude:
-          type: number
-          description: Longitude of the center of the postal code area
-          format: double
-          nullable: true
