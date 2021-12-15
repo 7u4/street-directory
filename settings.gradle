@@ -30,4 +30,4 @@ gradleEnterprise {
     }
 }
 
-rootProject.name = 'street-lister'
+rootProject.name = 'street-directory'

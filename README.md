@@ -1,12 +1,12 @@
 <!--- some badges to display on the GitHub page -->
 
-![Travis (.org)](https://img.shields.io/travis/debuglevel/street-lister?label=Travis%20build)
-![Gitlab pipeline status](https://img.shields.io/gitlab/pipeline/debuglevel/street-lister?label=GitLab%20build)
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/debuglevel/street-lister?sort=semver)
-![GitHub](https://img.shields.io/github/license/debuglevel/street-lister)
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/debuglevel/street-lister)
+![Travis (.org)](https://img.shields.io/travis/debuglevel/street-directory?label=Travis%20build)
+![Gitlab pipeline status](https://img.shields.io/gitlab/pipeline/debuglevel/street-directory?label=GitLab%20build)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/debuglevel/street-directory?sort=semver)
+![GitHub](https://img.shields.io/github/license/debuglevel/street-directory)
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/debuglevel/street-directory)
 
-# Street lister
+# Street-Directory
 
 This microservice extracts postal codes and streets inside them from OpenStreetMaps via Overpass API.
 

@@ -1,0 +1,3 @@
+package de.debuglevel.streetdirectory.street.extraction
+
+interface StreetExtractorSettings

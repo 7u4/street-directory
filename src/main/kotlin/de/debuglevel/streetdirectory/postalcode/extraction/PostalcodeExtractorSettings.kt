@@ -1,0 +1,3 @@
+package de.debuglevel.streetdirectory.postalcode.extraction
+
+interface PostalcodeExtractorSettings

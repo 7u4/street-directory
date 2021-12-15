@@ -1,3 +1,0 @@
-package de.debuglevel.streetlister.street.extraction
-
-interface StreetExtractorSettings

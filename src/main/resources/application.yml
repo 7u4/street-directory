@@ -1,5 +1,5 @@
 app:
-  street-lister:
+  street-directory:
     extractors:
       overpass:
         # Base URL of the service
@@ -7,7 +7,7 @@ app:
         # less picky about quotas than overpass-api.de
         base-url: https://overpass.kumi.systems/api/
         # User-Agent to be set in HTTP headers as requested by e.g. overpass-api.de
-        user-agent: github.com/debuglevel/street-lister
+        user-agent: github.com/debuglevel/street-directory
         # Number of maximum parallel requests to service
         maximum-threads: 1
         # How long should be waited between two requests (in nanoseconds).
@@ -37,7 +37,7 @@ app:
 
 micronaut:
   application:
-    name: street-lister
+    name: street-directory
     instance:
       id: ${random.shortuuid} # instance ID should be set random if Consul registration is active to avoid collisions (default ID would be the port number)
   server:
